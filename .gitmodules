@@ -1,0 +1,3 @@
+[submodule "StanfordQuadruped"]
+	path = StanfordQuadruped
+	url = git@github.com:Prakyathkantharaju/StanfordQuadruped.git
