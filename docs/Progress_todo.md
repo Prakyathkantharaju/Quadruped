@@ -5,10 +5,12 @@
 ## Progress
 
 - Pupper doing trot gait.
+https://user-images.githubusercontent.com/34353557/176941963-deeca02d-0d3c-40f3-b865-a37ec2c42dd3.mp4
+
 
 
 - Video recording from a usb webcam. which will be used as the range camera.
-
+https://user-images.githubusercontent.com/34353557/176941843-26a7d88f-598b-42b2-863b-8b842f17a2fd.mp4
 
 ## TODO
 
