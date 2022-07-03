@@ -41,3 +41,5 @@ sudo pip3 install --update six
 ```
 
 
+# PS4 Connector connection.
+- Please follow the official documentation.
