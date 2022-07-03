@@ -4,7 +4,23 @@
 
 ## Progress
 
-- Pupper doing trot gait.
+- Not working trot gait in sim.
+
+
+
+
+https://user-images.githubusercontent.com/34353557/177056729-e0e71cb5-a3f2-40f7-a11f-578046c618cf.mp4
+
+
+
+- Depth camera working in realtime.
+
+
+https://user-images.githubusercontent.com/34353557/177056712-b90abb67-98c2-4b50-a632-0895d12dbc2f.mp4
+
+
+
+- Pupper doing trot gait. (its not very stable)
 
 https://user-images.githubusercontent.com/34353557/176941963-deeca02d-0d3c-40f3-b865-a37ec2c42dd3.mp4
 
