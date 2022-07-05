@@ -36,6 +36,8 @@ plt.ion()
 while True:
     start_time = time.time()
     ret, frame = cam.read()
+    frame = cv2.resize(frame, (0,0), fx = 0.33, fy = 0.33)
+
 
     if not ret:
         print("failed to read anything")

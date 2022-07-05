@@ -9,12 +9,14 @@ class PupperBase:
 	def __init__(self, model_path: str):
 		self.model = load_model_from_path(model_path)
 		self.sim = MjSim(self.model)
+		self.data = self.sim.data
 		self.viewer = MjViewer(self.sim)
 		self.sim.step()
 		# information about the model
-		if False:
+		if True:
 			print(len(self.sim.data.ctrl))
-			print(self.model.actuator_names)
+			print(dir(self.sim.data))
+			# print(self.model.actuator_names)
 			print([print(c)  for c in dir(self.model) if 'quat' in c ])
 			print(self.model.body_names)
 
