@@ -180,9 +180,13 @@ while True:
     if CALIBRATION:
         results = np.array(results)
         i = 0
+        store_distances = []
         for value, model in zip(results, cal_model_store):
-            print(f"{i}. Current distance: {model.predict(value.reshape(1,-1))}")
+            #print(f"{i}. Current distance: {model.predict(value.reshape(1,-1))}")
+            store_distances.append(model.predict(value.reshape(1,-1)).tolist()[0])
             i += 1
+
+        print(store_distances)
 
 
 

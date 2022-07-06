@@ -73,7 +73,7 @@ def main():
                 # print("error:", error)
                 #command.yaw_rate = np.clip(error, a_min=-0.3, a_max=0.3)
                 # command.yaw_rate = 0.1
-                command.height = -0.15
+                command.height = -0.2
                 # command.height = -0.2
 
         controller.run(state, command)
