@@ -40,8 +40,8 @@ class CarEnv(mujoco_env.MujocoEnv):
 
     def _get_reward(self):
         reward = 0
-        reward -= np.sum(np.sqrt(self.cur_action**2)) * 0.01
-        reward += self._on_target * 0.01
+        # reward -= np.sum(np.sqrt(self.cur_action**2)) * 0.01
+        reward += self._on_target * 0.001
         reward += self.data.qvel[1]
         return reward
 

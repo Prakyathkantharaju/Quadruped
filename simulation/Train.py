@@ -74,7 +74,7 @@ if __name__ == '__main__':
 	env_list = [make_env(0), make_env(1), make_env(2), make_env(3)]
 
 	# check_env(env)
-	train_env = DummyVecEnv(env_list)
+	train_env = SubprocVecEnv(env_list, start_method='fork')
 	train_env = VecVideoRecorder(train_env, f'./.run_logs/videos/{run.id}', record_video_trigger=lambda x: x % 100000 == 0, video_length = 20000)
 
 	train_env.reset()
