@@ -2,6 +2,9 @@
 __pycache__/
 *.py[cod]
 *$py.class
+simulation/wandb/*
+simulation/run_logs/*
+simulation/.run_logs/*
 
 # C extensions
 *.so

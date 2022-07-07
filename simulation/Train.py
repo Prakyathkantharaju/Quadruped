@@ -48,7 +48,7 @@ run = wandb.init(
 	sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
 	monitor_gym=True,  # auto-upload the videos of agents playing the game
 	save_code=True,  # optional
-    name="A2C-car-env-v1",
+    name="PPO-car-env-v1",
 )
 
 
@@ -71,7 +71,7 @@ def make_env(seed=0):
 
 
 if __name__ == '__main__':
-	env_list = [make_env(0)]
+	env_list = [make_env(0), make_env(1), make_env(2), make_env(3)]
 
 	# check_env(env)
 	train_env = DummyVecEnv(env_list)
@@ -79,11 +79,11 @@ if __name__ == '__main__':
 
 	train_env.reset()
 
-	model = A2C("MlpPolicy", train_env, tensorboard_log=f"./run_logs/logs/{run.id}")
+	model = PPO("MlpPolicy", train_env, tensorboard_log=f"./.run_logs/logs/{run.id}", device="cuda")
 	# model.load("Models_parkour_large_1")
 
 	model.learn(total_timesteps=5000000, log_interval=1, callback=WandbCallback(gradient_save_freq=1000,  model_save_freq=10000, log="all",
-									model_save_path=f"./run_logs/models/{run.id}", verbose=2))
+									model_save_path=f"./.run_logs/models/{run.id}", verbose=2))
 
 
 	model.save(f"./.run_logs/full_model.pkl")

@@ -41,14 +41,16 @@ class CarEnv(mujoco_env.MujocoEnv):
     def _get_reward(self):
         reward = 0
         reward -= np.sum(np.sqrt(self.cur_action**2)) * 0.01
-        reward += self._on_target * 0.1
-        reward += self._on_target * self.data.qvel[1]
+        reward += self._on_target * 0.01
+        reward += self.data.qvel[1]
         return reward
 
     @property
     def _alive(self):
-        distance_traveled_las = self.data.sensordata[0] < 1e-2
-        if distance_traveled_las and self._on_target and self._i > 20:
+        distance_traveled_las = np.all(self.data.sensordata[:2] < 1e-2)
+    
+        # print(f"distance traveled: {distance_traveled_las}")
+        if distance_traveled_las and self._i > 200:
             return False
         else:
             return True
@@ -67,7 +69,11 @@ class CarEnv(mujoco_env.MujocoEnv):
         excentric_observation = self._get_obs()
         reward = self._get_reward()
         done = not self._alive
-        #print(f"reward: {reward}")
+        if done:
+            print(f"{self._i} reward: {reward}, alive {self._alive}, on target {self._on_target}, actions {self.cur_action}")
+        if self._i > 1000:
+            print(f"{self._i} reward: {reward}, alive {self._alive}, on target {self._on_target}, actions {self.cur_action}")
+            done = True
         return excentric_observation, reward, done, {'reward': reward, 'isalive': self._alive, 'ontarget': self._on_target}
 
     def reset_model(self):
