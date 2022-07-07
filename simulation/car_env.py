@@ -18,61 +18,94 @@ class CarEnv(mujoco_env.MujocoEnv):
     }
 
     def __init__(self, model_path, frame_skip=1, **kwargs):
+        self.model_path = model_path
+        self.frame_skip = frame_skip
         observation_space = Box(low=-10, high=10, shape=(1, 10), dtype=np.float32)
         self.action_space = Box(low=-1, high=1, shape=(2,), dtype=np.float32)
+        self._i = 0
 
         mujoco_env.MujocoEnv.__init__(
-            self, model_path, frame_skip)
+            self, self.model_path, frame_skip)
 
+        self._distance_traveled = 0
 
     def _get_obs(self):
         data = self.render(mode = "rgb_array",width = 300, height=300, camera_name="buddy_realsense_d435i")
-
-        # print(i)
         data = cv2.cvtColor(data, cv2.COLOR_RGB2BGR)
-        cv2.imshow("data", data)
         seg =  cv2,inRange(data, (0, 0, 50), (50, 50,255))
-        self.seg = seg[1]
         short_snip = seg[1][:, 230:240] / 255
-        short_snip = np.sum(short_snip, axis = 1)[150:-70]
+        short_snip = np.sum(short_snip, axis = 1)[150:-70] / 10
+        self.short_snip = short_snip
         return short_snip
 
     def _get_reward(self):
         reward = 0
-        
-        reward += self._alive
-        reward += self._on_target
-        reward += self.sim.data.qvel[1]
+        reward -= np.sum(np.sqrt(self.cur_action**2)) * 0.01
+        reward += self._on_target * 0.1
+        reward += self._on_target * self.data.qvel[1]
+        return reward
 
+    @property
+    def _alive(self):
+        distance_traveled_las = self.data.sensordata[0] < 1e-2
+        if distance_traveled_las and self._on_target and self._i > 20:
+            return False
+        else:
+            return True
+
+    @property
+    def _on_target(self):
+        if (np.sum(self.short_snip) > 2):
+            return True
+        else:
+            return False
 
     def step(self, action):
+        self._i += 1
+        self.cur_action = action
         self.do_simulation(action, self.frame_skip)
-        return np.array([0, 0, 0, 0]), 0, False, {}
+        excentric_observation = self._get_obs()
+        reward = self._get_reward()
+        done = not self._alive
+        #print(f"reward: {reward}")
+        return excentric_observation, reward, done, {'reward': reward, 'isalive': self._alive, 'ontarget': self._on_target}
 
     def reset_model(self):
-        return 0
-    
+        self._i = 0
+        mujoco_env.MujocoEnv.__init__(
+            self, self.model_path, self.frame_skip)
+
+
+        return self._get_obs()
+
+
+
+
 
 if __name__ == "__main__":
     carenv = CarEnv("/home/prakyathkantharaju/gitfolder/personal/Quadruped/simulation/models/block.xml")
 
+    i = 0
+    carenv.step(np.array([0, 0]))
     while True:
-        carenv.step(np.array([0, 1]))
+        i += 1
+
         data = carenv.render(mode = "rgb_array",width = 300, height=300, camera_name="buddy_realsense_d435i")
-        # print(i)
+        print(f"{i}. On target {carenv._on_target}")
+        print(f"{carenv.short_snip}")
+        print(f"{carenv._alive}")
         data = cv2.cvtColor(data, cv2.COLOR_RGB2BGR)
-        cv2.imshow("data", data)
         seg =  cv2,inRange(data, (0, 0, 50), (50, 50,255))
         seg_1 = seg[1]
         short_snip = seg[1][:, 230:240] / 255
         short_snip = np.sum(short_snip, axis = 1)[150:-70]
-
-
-        cv2.imshow("seg", seg_1)
-        k = cv2.waitKey()
-
-        if k%256 == 27:
-            # ESC pressed
-            print("Escape hit, closing...")
+        cv2.imshow('data', data)
+        key = cv2.waitKey(0) & 0xFF
+        if key == ord("q"):
             break
-
+        if key == ord("w"):
+            carenv.step(np.array([0, 1]))
+        else:
+            carenv.step(np.array([0, 0]))
+        if i > 200:
+            carenv.reset()

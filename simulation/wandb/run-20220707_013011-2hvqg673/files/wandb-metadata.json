@@ -1,0 +1,24 @@
+{
+    "os": "Linux-5.17.5-76051705-generic-x86_64-with-glibc2.35",
+    "python": "3.10.4",
+    "heartbeatAt": "2022-07-07T06:30:13.129077",
+    "startedAt": "2022-07-07T06:30:11.223202",
+    "docker": null,
+    "gpu": "Quadro T1000",
+    "gpu_count": 1,
+    "cpu_count": 12,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/home/prakyathkantharaju/gitfolder/personal/Quadruped/simulation/Train.py",
+    "codePath": "simulation/Train.py",
+    "git": {
+        "remote": "git@github.com:Prakyathkantharaju/Quadruped.git",
+        "commit": "92142770593a958dc0c634633781d581f2b14020"
+    },
+    "email": "prakyathk33@gmail.com",
+    "root": "/home/prakyathkantharaju/gitfolder/personal/Quadruped",
+    "host": "pop-os",
+    "username": "prakyathkantharaju",
+    "executable": "/home/prakyathkantharaju/gitfolder/personal/Quadruped/.env/bin/python"
+}
