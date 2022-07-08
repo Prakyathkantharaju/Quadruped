@@ -11,7 +11,8 @@ from stable_baselines3.common.utils import set_random_seed
 import sys, os
 import numpy as np
 
-
+import warnings
+warnings.filterwarnings("ignore")
 from stable_baselines3.common.env_checker import check_env
 
 # # load wandb
@@ -74,12 +75,13 @@ if __name__ == '__main__':
 	env_list = [make_env(0), make_env(1), make_env(2), make_env(3)]
 
 	# check_env(env)
-	train_env = SubprocVecEnv(env_list, start_method='fork')
+	train_env = DummyVecEnv(env_list)
+	# train_env = SubprocVecEnv(env_list, start_method='fork')
 	train_env = VecVideoRecorder(train_env, f'./.run_logs/videos/{run.id}', record_video_trigger=lambda x: x % 100000 == 0, video_length = 20000)
 
 	train_env.reset()
 
-	model = PPO("MlpPolicy", train_env, tensorboard_log=f"./.run_logs/logs/{run.id}", device="cuda")
+	model = PPO("MlpPolicy", train_env, tensorboard_log=f"./.run_logs/logs/{run.id}", device="cuda", normalize_advantage=True, use_sde=True, sde_sample_freq=10)
 	# model.load("Models_parkour_large_1")
 
 	model.learn(total_timesteps=5000000, log_interval=1, callback=WandbCallback(gradient_save_freq=1000,  model_save_freq=10000, log="all",
