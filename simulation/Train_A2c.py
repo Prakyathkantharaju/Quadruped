@@ -21,7 +21,7 @@ from wandb.integration.sb3 import WandbCallback
 
 
 # from mujoco_py import GlfwContext
-# GlfwContext(offscreen=True) 
+# GlfwContext(offscreen=True)
 
 
 
@@ -30,7 +30,7 @@ path_ = os.getcwd()
 rel_path = 'models/block.xml'
 path = path_ + '/' + rel_path
 rel_path_2 = 'models/block_2.xml'
-path_2 = path_ + '/' + rel_path_2 
+path_2 = path_ + '/' + rel_path_2
 # load environment
 from car_env import CarEnv
 
@@ -66,7 +66,7 @@ run = wandb.init(
 	sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
 	monitor_gym=True,  # auto-upload the videos of agents playing the game
 	save_code=True,  # optional
-    name="A2C-car-env-v1",
+    name="A2C-car-env-v2",
 )
 
 

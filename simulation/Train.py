@@ -21,7 +21,7 @@ from wandb.integration.sb3 import WandbCallback
 
 
 # from mujoco_py import GlfwContext
-# GlfwContext(offscreen=True) 
+# GlfwContext(offscreen=True)
 
 
 
@@ -66,7 +66,7 @@ run = wandb.init(
 	sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
 	monitor_gym=True,  # auto-upload the videos of agents playing the game
 	save_code=True,  # optional
-    name="PPO-car-env-v1",
+    name="PPO-car-env-v2",
 )
 
 
