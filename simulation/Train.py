@@ -72,7 +72,7 @@ def make_env(seed=0):
 
 
 if __name__ == '__main__':
-	env_list = [make_env(0), make_env(1), make_env(2), make_env(3)]
+	env_list = [make_env(0)]
 
 	# check_env(env)
 	train_env = DummyVecEnv(env_list)

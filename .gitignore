@@ -5,6 +5,7 @@ __pycache__/
 simulation/wandb/*
 simulation/run_logs/*
 simulation/.run_logs/*
+simulation/.other/*
 
 # C extensions
 *.so

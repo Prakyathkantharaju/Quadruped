@@ -50,7 +50,7 @@ class CarEnv(mujoco_env.MujocoEnv):
         # cv2.imshow('wtf', short_snip)
         # cv2.rectangle(data,  (70, 225), (230, 280), (0, 0, 255), 2)
         # cv2.imshow("snip", data)
-        short_snip = np.sum(short_snip, axis = 1)
+        short_snip = np.mean(short_snip, axis = 1)
         self.short_snip = short_snip
         short_snip  =  np.split(short_snip, 10)
         short_snip = np.mean(short_snip, axis = 0)
@@ -63,7 +63,7 @@ class CarEnv(mujoco_env.MujocoEnv):
     def _get_reward(self):
         reward = 0
         reward += self._on_target * 0.001
-        reward += self.data.qvel[0]
+        reward += self._on_target * self.data.qvel[0]
 
         # give reward only when going forward
         if np.mean(self.velocity_store[:-5]) > 0.001:
@@ -148,14 +148,16 @@ if __name__ == "__main__":
         if key == ord("q"):
             break
         if key == ord("w"):
-            _, reward, _, _ = carenv.step(np.array([0, 1]))
+            obs, reward, _, _ = carenv.step(np.array([0, 1]))
         elif key == ord ("a"):
-            _, reward, _, _ = carenv.step(np.array([-1, 0]))
+            obs, reward, _, _ = carenv.step(np.array([-1, 0]))
         elif key ==ord("d"):
-            _, reward, _, _ = carenv.step(np.array([1, 0]))
+            obs, reward, _, _ = carenv.step(np.array([1, 0]))
         else:
-            _, reward, _, _ = carenv.step(np.array([0, 0]))
+            obs, reward, _, _ = carenv.step(np.array([0, 0]))
         if carenv._alive == False:
             break
 
         print(f"Reward: {reward}")
+        print(f"On target: {carenv._on_target}")
+        print(f"obs {obs}")
