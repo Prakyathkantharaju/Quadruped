@@ -111,7 +111,7 @@ if __name__ == '__main__':
 
 	train_env.reset()
 
-	model = PPO("MlpPolicy", train_env, tensorboard_log=f"./.run_logs/logs/{run.id}", device="cuda", normalize_advantage=True, use_sde=True, sde_sample_freq=10,
+	model = PPO("MlpPolicy", train_env, tensorboard_log=f"./.run_logs/logs/{run.id}", device="cuda", normalize_advantage=True, 
 	create_eval_env=True)
 	# model.load("Models_parkour_large_1")
 
