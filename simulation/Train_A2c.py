@@ -44,7 +44,7 @@ config = {
 }
 
 gym.envs.register(
-     id='car_robot',
+     id='car-robot',
      entry_point='car_env:CarEnv',
      max_episode_steps=2000,
 	 kwargs={'model_path': path}
@@ -52,7 +52,7 @@ gym.envs.register(
 
 
 gym.envs.register(
-     id='car_robot_left',
+     id='car-robot-left',
      entry_point='car_env:CarEnv',
      max_episode_steps=2000,
 	 kwargs={'model_path': path_2}
@@ -79,7 +79,7 @@ def make_env(seed=0):
 	def _init():
 		# env.reset()
 
-		env = gym.make('car_robot')
+		env = gym.make('car-robot')
 		print(f"env seed: {seed}")
 		return Monitor(env)
 
@@ -94,7 +94,7 @@ def make_env_2(seed=0):
 	def _init():
 		# env.reset()
 
-		env = gym.make('car_robot_left')
+		env = gym.make('car-robot-left')
 		print(f"env seed: {seed}")
 		return Monitor(env)
 
