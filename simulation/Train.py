@@ -44,7 +44,7 @@ config = {
 }
 
 gym.envs.register(
-     id='car-robot',
+     id='car-robot-v1',
      entry_point='car_env:CarEnv',
      max_episode_steps=1000,
 	 kwargs={'model_path': path}
@@ -52,7 +52,7 @@ gym.envs.register(
 
 
 gym.envs.register(
-     id='car-robot-left',
+     id='car-robot-left-v1',
      entry_point='car_env:CarEnv',
      max_episode_steps=2000,
 	 kwargs={'model_path': path_2}
@@ -79,7 +79,7 @@ def make_env(seed=0):
 	def _init():
 		# env.reset()
 
-		env = gym.make('car-robot')
+		env = gym.make('car-robot-v1')
 		print(f"env seed: {seed}")
 		return Monitor(env)
 
@@ -93,7 +93,7 @@ def make_env_2(seed=0):
 	def _init():
 		# env.reset()
 
-		env = gym.make('car-robot-left')
+		env = gym.make('car-robot-left-v1')
 		print(f"env seed: {seed}")
 		return Monitor(env)
 
@@ -111,7 +111,7 @@ if __name__ == '__main__':
 
 	train_env.reset()
 
-	model = PPO("MlpPolicy", train_env, tensorboard_log=f"./.run_logs/logs/{run.id}", device="cuda", normalize_advantage=True, 
+	model = PPO("MlpPolicy", train_env, tensorboard_log=f"./.run_logs/logs/{run.id}", device="cuda", normalize_advantage=True,
 	create_eval_env=True)
 	# model.load("Models_parkour_large_1")
 
