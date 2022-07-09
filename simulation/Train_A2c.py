@@ -86,15 +86,14 @@ if __name__ == '__main__':
 	# check_env(env)
 	train_env = DummyVecEnv(env_list)
 	# train_env = SubprocVecEnv(env_list, start_method='fork')
-	train_env = VecVideoRecorder(train_env, f'./.run_logs/videos/{run.id}', record_video_trigger=lambda x: x % 100000 == 0, video_length = 20000)
+	train_env = VecVideoRecorder(train_env, f'./.run_logs/videos/{run.id}', record_video_trigger=lambda x: x % 10000 == 0, video_length = 2000)
 
 	train_env.reset()
 
-	model = PPO("MlpPolicy", train_env, tensorboard_log=f"./.run_logs/logs/{run.id}", device="cuda", normalize_advantage=True, use_sde=True, sde_sample_freq=10,
-	create_eval_env=True)
+	model = A2C("MlpPolicy", train_env, tensorboard_log=f"./.run_logs/logs/{run.id}", device="cuda", normalize_advantage=True,create_eval_env=True)
 	# model.load("Models_parkour_large_1")
 
-	model.learn(total_timesteps=5000000, log_interval=1, callback=WandbCallback(gradient_save_freq=1000,  model_save_freq=1000,
+	model.learn(total_timesteps=500000, log_interval=1, callback=WandbCallback(gradient_save_freq=10000,  model_save_freq=10000,
 									model_save_path=f"./.run_logs/models/{run.id}", verbose=2))
 
 

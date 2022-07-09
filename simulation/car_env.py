@@ -62,8 +62,8 @@ class CarEnv(mujoco_env.MujocoEnv):
 
     def _get_reward(self):
         reward = 0
-        reward += self._on_target * 0.001
-        reward += self._on_target * self.data.qvel[0]
+        reward += self._on_target * 0.1
+        reward += self._on_target * self.data.qvel[0] * 0.01
 
         # give reward only when going forward
         if np.mean(self.velocity_store[:-5]) > 0.001:
