@@ -84,7 +84,7 @@ if __name__ == '__main__':
 	model = PPO("MlpPolicy", train_env, tensorboard_log=f"./.run_logs/logs/{run.id}", device="cuda", normalize_advantage=True, use_sde=True, sde_sample_freq=10)
 	# model.load("Models_parkour_large_1")
 
-	model.learn(total_timesteps=5000000, log_interval=1, callback=WandbCallback(gradient_save_freq=1000,  model_save_freq=10000, log="all",
+	model.learn(total_timesteps=5000000, log_interval=1, callback=WandbCallback(gradient_save_freq=1000,  model_save_freq=1000,
 									model_save_path=f"./.run_logs/models/{run.id}", verbose=2))
 
 
