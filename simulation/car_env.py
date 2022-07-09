@@ -143,16 +143,18 @@ if __name__ == "__main__":
         short_snip = np.sum(short_snip, axis = 1)[150:-70]
         cv2.rectangle(seg[1], (70, 225), (230, 280), (0, 0, 255), 2)
         cv2.imshow('data', data)
-        cv2.imshow('seg', seg[1])
+        free = carenv.render(mode = "rgb_array", camera_name="buddy_third_person")
+        cv2.imshow('free', seg[1])
+        cv2.imshow('seg', cv2.cvtColor(free, cv2.COLOR_RGB2BGR))
         key = cv2.waitKey(0) & 0xFF
         if key == ord("q"):
             break
         if key == ord("w"):
             obs, reward, _, _ = carenv.step(np.array([0, 1]))
         elif key == ord ("a"):
-            obs, reward, _, _ = carenv.step(np.array([-1, 0]))
-        elif key ==ord("d"):
             obs, reward, _, _ = carenv.step(np.array([1, 0]))
+        elif key ==ord("d"):
+            obs, reward, _, _ = carenv.step(np.array([-1, 0]))
         else:
             obs, reward, _, _ = carenv.step(np.array([0, 0]))
         if carenv._alive == False:

@@ -29,6 +29,8 @@ path_ = os.getcwd()
 
 rel_path = 'models/block.xml'
 path = path_ + '/' + rel_path
+rel_path_2 = 'models/block_2.xml'
+path_2 = path_ + '/' + rel_path_2 
 # load environment
 from car_env import CarEnv
 
@@ -37,18 +39,24 @@ from car_env import CarEnv
 # wandb config
 config = {
 	"policy_type": "MlpPolicy",
-	"total_timesteps": 1000,
+	"total_timesteps": 2000,
 	"env_name": "car_env_v1",
 }
 
 gym.envs.register(
      id='car_robot',
      entry_point='car_env:CarEnv',
-     max_episode_steps=1000,
+     max_episode_steps=2000,
 	 kwargs={'model_path': path}
 )
 
 
+gym.envs.register(
+     id='car_robot_left',
+     entry_point='car_env:CarEnv',
+     max_episode_steps=2000,
+	 kwargs={'model_path': path_2}
+)
 
 # env.render()
 
@@ -79,9 +87,24 @@ def make_env(seed=0):
 	return _init
 
 
+def make_env_2(seed=0):
+	"""
+	Create a wrapped, monitored SubprocVecEnv for Hopper
+	"""
+	def _init():
+		# env.reset()
+
+		env = gym.make('car_robot_left')
+		print(f"env seed: {seed}")
+		return Monitor(env)
+
+	set_random_seed(seed)
+	return _init
+
 
 if __name__ == '__main__':
-	env_list = [make_env(0), make_env(120)]
+	env_list = [make_env(0), make_env_2(120)]
+
 
 	# check_env(env)
 	train_env = DummyVecEnv(env_list)
