@@ -99,7 +99,7 @@ class CarEnv(mujoco_env.MujocoEnv):
         
         if done:
             print(f"{self._i} reward: {reward}, alive {self._alive}, on target {self._on_target}, actions {self.cur_action}")
-        if self._i > 10000:
+        if self._i > 1000:
             # reward = 1000
             print(f"{self._i} reward: {reward}, alive {self._alive}, on target {self._on_target}, actions {self.cur_action}")
             done = True
