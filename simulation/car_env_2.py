@@ -28,6 +28,7 @@ class CarEnv(mujoco_env.MujocoEnv):
         self._i = 0
         self.velocity_store = []
         self.distance_store = []
+        self.reward_store = []
         self.zero_vel_coutner = 0
         self.distance = 200
 
@@ -46,7 +47,7 @@ class CarEnv(mujoco_env.MujocoEnv):
         return data
 
     def _get_reward(self):
-        reward = -self.distance * 0.1
+        reward = (130 -self.distance) * 0.1
         velocity = self.data.qvel[0]
         reward += velocity * 0.01
         return reward
@@ -54,7 +55,7 @@ class CarEnv(mujoco_env.MujocoEnv):
     @property
     def _alive(self):
         # dead if distance is a bit more than initial values.
-        if (self.distance > 125) or (len(self.distance_store) > 200 and (self.distance > np.mean(self.distance_store[-150:-50]))) or (len(self.velocity_store) > 20 and np.mean(self.velocity_store[-5:]) < 0.001):
+        if (self.distance > 125) or (len(self.distance_store) > 200 and (self.distance > np.mean(self.distance_store[-150:-50]))) or (len(self.velocity_store) > 200 and np.mean(self.velocity_store[-5:]) < 0.001):
             return False
         else:
             return True
@@ -79,6 +80,8 @@ class CarEnv(mujoco_env.MujocoEnv):
         target_location = np.array([np.mean(target_location_x), np.mean(target_location_y)])
         #print(car_location, target_location)
         distance = np.linalg.norm(target_location - car_location)
+        if self._i < 2 and distance < 100:
+            distance = 125
         return distance
 
 
@@ -95,6 +98,7 @@ class CarEnv(mujoco_env.MujocoEnv):
         observations = self._get_obs()
         reward = self._get_reward()
         self.velocity_store.append(self.data.qvel[0])
+        self.reward_store.append(reward)
         done = not self._alive
         if (self.viewer.cam is not None) and (self.viewer.cam.distance > 12):
             self.viewer.cam.distance = 12.0
@@ -103,6 +107,7 @@ class CarEnv(mujoco_env.MujocoEnv):
         if False:
             print(self.distance, np.mean(self.distance_store[-10:]))
             print(self.data.qvel[0], np.mean(self.velocity_store[-10:]))
+            print(self.reward_store)
             print(f"{self._i} reward: {reward}, alive {self._alive}, on target {self.distance}, actions {self.cur_action}")
         if self._i > 10000:
             # reward = 1000
@@ -120,6 +125,7 @@ class CarEnv(mujoco_env.MujocoEnv):
         self._i = 0
         self.velocity_store = []
         self.distance_store  = []
+        self.reward_store  = []
         self.zero_vel_coutner = 0
 
         mujoco_env.MujocoEnv.__init__(
