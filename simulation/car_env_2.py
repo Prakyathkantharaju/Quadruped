@@ -34,7 +34,7 @@ class CarEnv(mujoco_env.MujocoEnv):
         mujoco_env.MujocoEnv.__init__(
             self, self.model_path, frame_skip)
 
-        
+
 
     def _get_obs(self):
         incentric = self._incentric_obs()
@@ -54,7 +54,7 @@ class CarEnv(mujoco_env.MujocoEnv):
     @property
     def _alive(self):
         # dead if distance is a bit more than initial values.
-        if (self.distance > 125) or (len(self.distance_store) > 200 and (self.distance > np.mean(self.distance_store[-150:-50]))) or (len(self.velocity_store) > 10 and np.mean(self.velocity_store[-5:]) < 0.001):
+        if (self.distance > 125) or (len(self.distance_store) > 200 and (self.distance > np.mean(self.distance_store[-150:-50]))) or (len(self.velocity_store) > 20 and np.mean(self.velocity_store[-5:]) < 0.001):
             return False
         else:
             return True
@@ -91,7 +91,6 @@ class CarEnv(mujoco_env.MujocoEnv):
         self.do_simulation(action, self.frame_skip)
         self.distance = self._distance()
         self.distance_store.append(self.distance)
-        print(self.distance_store[-10:])
 
         observations = self._get_obs()
         reward = self._get_reward()
@@ -99,10 +98,11 @@ class CarEnv(mujoco_env.MujocoEnv):
         done = not self._alive
         if (self.viewer.cam is not None) and (self.viewer.cam.distance > 12):
             self.viewer.cam.distance = 12.0
-        
-        
+
+
         if done:
             print(self.distance, np.mean(self.distance_store[-10:]))
+            print(self.data.qvel[0], np.mean(self.velocity_store[-10:]))
             print(f"{self._i} reward: {reward}, alive {self._alive}, on target {self.distance}, actions {self.cur_action}")
         if self._i > 10000:
             # reward = 1000
@@ -134,7 +134,7 @@ class CarEnv(mujoco_env.MujocoEnv):
 
 if __name__ == "__main__":
     carenv = CarEnv("/home/prakyathkantharaju/gitfolder/personal/Quadruped/simulation/models/distance_simple.xml")
-    
+
     carenv.viewer.cam.distance = 12
     print(carenv.viewer.cam.distance)
     print(carenv.action_space)
@@ -165,9 +165,9 @@ if __name__ == "__main__":
         reward += velocity * 0.01
         cv2.imshow('fulll', np.hstack((data, cv2.cvtColor(target, cv2.COLOR_GRAY2BGR), cv2.cvtColor(car, cv2.COLOR_GRAY2BGR))))
 
-        
 
-        # 
+
+        #
         free = carenv.render(mode = "rgb_array")
         key = cv2.waitKey(0) & 0xFF
         if key == ord("q"):
