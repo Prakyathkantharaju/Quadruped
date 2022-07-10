@@ -100,7 +100,7 @@ class CarEnv(mujoco_env.MujocoEnv):
             self.viewer.cam.distance = 12.0
 
 
-        if done:
+        if False:
             print(self.distance, np.mean(self.distance_store[-10:]))
             print(self.data.qvel[0], np.mean(self.velocity_store[-10:]))
             print(f"{self._i} reward: {reward}, alive {self._alive}, on target {self.distance}, actions {self.cur_action}")
