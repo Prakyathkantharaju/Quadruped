@@ -122,6 +122,7 @@ class CarEnv(mujoco_env.MujocoEnv):
 
 if __name__ == "__main__":
     carenv = CarEnv("/home/prakyathkantharaju/gitfolder/personal/Quadruped/simulation/models/block.xml")
+    carenv.viewer.cam.distance = carenv.viewer.cam.distance * 0.3   
     print(carenv.action_space)
     for i in range(10):
         print(carenv.action_space.sample())
@@ -132,6 +133,7 @@ if __name__ == "__main__":
 
         data = carenv.render(mode = "rgb_array",width = 300, height=300, camera_name="buddy_realsense_d435i")
         data_og = data
+        
 
         # print(f"{i}. On target {carenv._on_target}")#
         # print(f"{carenv.short_snip}")
@@ -143,7 +145,7 @@ if __name__ == "__main__":
         short_snip = np.sum(short_snip, axis = 1)[150:-70]
         cv2.rectangle(seg[1], (70, 225), (230, 280), (0, 0, 255), 2)
         cv2.imshow('data', data)
-        free = carenv.render(mode = "rgb_array", camera_name="buddy_third_person")
+        free = carenv.render(mode = "rgb_array")
         cv2.imshow('free', seg[1])
         cv2.imshow('seg', cv2.cvtColor(free, cv2.COLOR_RGB2BGR))
         key = cv2.waitKey(0) & 0xFF
