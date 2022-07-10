@@ -68,10 +68,10 @@ class CarEnv(mujoco_env.MujocoEnv):
 
         # indentifying the target.
         _, target =  cv2,inRange(data, (0, 0, 50), (50, 50,255))
-        cv2.imshow('target', target)
+        # cv2.imshow('target', target)
         _, car =  cv2,inRange(data, (50, 50, 50), (250, 250,250))
-        cv2.imshow('car', car)
-        key = cv2.waitKey(0) & 0xFF
+        # cv2.imshow('car', car)
+        # key = cv2.waitKey(0) & 0xFF
 
         car_location_x, car_location_y = np.where(car > 200)
         target_location_x, target_location_y = np.where(target > 200)
