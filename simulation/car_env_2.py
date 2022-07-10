@@ -49,7 +49,9 @@ class CarEnv(mujoco_env.MujocoEnv):
     def _get_reward(self):
         reward = (130 -self.distance) * 0.1
         velocity = self.data.qvel[0]
-        reward += velocity * 0.01
+        reward += velocity * 0.1
+        reward -= np.linalg.norm(self.cur_action) * 0.01
+        reward += self._alive * 0.001
         return reward
 
     @property
@@ -104,11 +106,14 @@ class CarEnv(mujoco_env.MujocoEnv):
             self.viewer.cam.distance = 12.0
 
 
-        if False:
+        if done:
+            print('$'*10)
+            print(len(self.reward_store))
             print(self.distance, np.mean(self.distance_store[-10:]))
             print(self.data.qvel[0], np.mean(self.velocity_store[-10:]))
-            print(self.reward_store)
-            print(f"{self._i} reward: {reward}, alive {self._alive}, on target {self.distance}, actions {self.cur_action}")
+            print(max(self.reward_store), min(self.reward_store))
+            print(max(self.distance_store), min(self.distance_store))
+            print(f"{self._i} reward: {np.sum(self.reward_store)}, alive {self._alive}, on target {self.distance}, actions {self.cur_action}")
         if self._i > 10000:
             # reward = 1000
             print(f"{self._i} reward: {reward}, alive {self._alive}, on target {self.distance}, actions {self.cur_action}")
