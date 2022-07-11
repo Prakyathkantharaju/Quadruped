@@ -47,17 +47,23 @@ class CarEnv(mujoco_env.MujocoEnv):
         return data
 
     def _get_reward(self):
-        reward = (130 -self.distance) * 0.1
+        reward = (130 -self.distance) / 130
+
+        # the bot is very close to the target, increase the reward to make it more likely to get to the target.
+        if  self.distance < 40:
+            reward *= 2
+            
+
         velocity = self.data.qvel[0]
-        reward += velocity * 0.1
+        reward += velocity 
         reward -= np.linalg.norm(self.cur_action) * 0.01
-        reward += self._alive * 0.001
         return reward
 
     @property
     def _alive(self):
         # dead if distance is a bit more than initial values.
-        if (self.distance > 125) or (len(self.distance_store) > 200 and (self.distance > np.mean(self.distance_store[-150:-50]))) or (len(self.velocity_store) > 200 and np.mean(self.velocity_store[-5:]) < 0.001):
+        if (self.distance > 125) or (len(self.distance_store) > 200 and (np.mean(self.distance_store[-50:]) > np.mean(self.distance_store[-150:-50]))) \
+        or (len(self.velocity_store) > 200 and np.mean(self.velocity_store[-5:]) < 0.001):
             return False
         else:
             return True
@@ -108,21 +114,25 @@ class CarEnv(mujoco_env.MujocoEnv):
 
         if done:
             print('$'*10)
-            print(len(self.reward_store))
-            print(self.distance, np.mean(self.distance_store[-10:]))
-            print(self.data.qvel[0], np.mean(self.velocity_store[-10:]))
+            print('Episode finished')
+
+            print(self.data.qvel[0] > np.mean(self.velocity_store[-10:]))
+            print((np.mean(self.distance_store[-50:]) > np.mean(self.distance_store[-150:-50])))
+            print(f"reward min, max")
             print(max(self.reward_store), min(self.reward_store))
+            print(f"distance max ,. min")
             print(max(self.distance_store), min(self.distance_store))
             print(f"{self._i} reward: {np.sum(self.reward_store)}, alive {self._alive}, on target {self.distance}, actions {self.cur_action}")
         if self._i > 10000:
             # reward = 1000
             print(f"{self._i} reward: {reward}, alive {self._alive}, on target {self.distance}, actions {self.cur_action}")
             done = True
-        if self.distance < 10:
+        if self.distance < 15:
             reward = 1000
             done = True
             print(f"{self._i} reward: {reward}, alive {self._alive}, on target {self.distance}, actions {self.cur_action}")
-        return observations, reward, done, {'reward': reward, 'isalive': self._alive, 'distance': self.distance}
+        return observations, reward, done, {'reward': np.sum(self.reward_store), 'isalive': self._alive, 'episode_length': self._i,
+        'distance': self.distance, 'max_distance': np.max(self.distance_store)}
 
     def reset_model(self):
         if self.model.cam is not None:
@@ -184,19 +194,20 @@ if __name__ == "__main__":
         if key == ord("q"):
             break
         if key == ord("w"):
-            obs, reward, _, _ = carenv.step(np.array([0, 1]))
+            obs, reward, _, info = carenv.step(np.array([0, 1]))
         elif key == ord ("a"):
-            obs, reward, _, _ = carenv.step(np.array([1, 0]))
+            obs, reward, _, info = carenv.step(np.array([1, 0]))
         elif key ==ord("d"):
-            obs, reward, _, _ = carenv.step(np.array([-1, 0]))
+            obs, reward, _, info = carenv.step(np.array([-1, 0]))
         elif key ==ord("s"):
-            obs, reward, _, _ = carenv.step(np.array([0, -1]))
+            obs, reward, _, info = carenv.step(np.array([0, -1]))
         else:
-            obs, reward, _, _ = carenv.step(np.array([0, 0]))
+            obs, reward, _, info = carenv.step(np.array([0, 0]))
         if carenv._alive == False:
             break
 
         print(f"Reward: {reward}")
         print(f"Distance: {carenv.distance}")
+        print(f"info {info}")
         # print(f"obs {obs}")
 

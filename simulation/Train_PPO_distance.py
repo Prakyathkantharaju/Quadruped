@@ -73,7 +73,7 @@ def make_env(seed=0):
 
         env = gym.make('car-robot-distance')
         print(f"env seed: {seed}")
-        return Monitor(env)
+        return Monitor(env, info_keywords=('reward','isalive', 'distance', 'max_distance', 'episode_length'), filename=f'.run_logs/logs/{run.id}')
 
     set_random_seed(seed)
     return _init
