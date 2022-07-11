@@ -50,7 +50,7 @@ class CarEnv(mujoco_env.MujocoEnv):
         reward = (130 -self.distance) / 130
 
         # the bot is very close to the target, increase the reward to make it more likely to get to the target.
-        if  self.distance < 40:
+        if  self.distance < 60:
             reward *= 2
             
 
@@ -61,9 +61,11 @@ class CarEnv(mujoco_env.MujocoEnv):
 
     @property
     def _alive(self):
+
+        body_far_away = 3 < self.data.geom_xpos[6,1] < 0.5
         # dead if distance is a bit more than initial values.
         if (self.distance > 125) or (len(self.distance_store) > 200 and (np.mean(self.distance_store[-50:]) > np.mean(self.distance_store[-150:-50]))) \
-        or (len(self.velocity_store) > 200 and np.mean(self.velocity_store[-5:]) < 0.001):
+        or (len(self.velocity_store) > 200 and np.mean(self.velocity_store[-5:]) < 0.001) or body_far_away:
             return False
         else:
             return True
@@ -196,9 +198,9 @@ if __name__ == "__main__":
         if key == ord("w"):
             obs, reward, _, info = carenv.step(np.array([0, 1]))
         elif key == ord ("a"):
-            obs, reward, _, info = carenv.step(np.array([1, 0]))
+            obs, reward, _, info = carenv.step(np.array([1, 1]))
         elif key ==ord("d"):
-            obs, reward, _, info = carenv.step(np.array([-1, 0]))
+            obs, reward, _, info = carenv.step(np.array([-1, 1]))
         elif key ==ord("s"):
             obs, reward, _, info = carenv.step(np.array([0, -1]))
         else:
@@ -208,6 +210,7 @@ if __name__ == "__main__":
 
         # print(f"Reward: {reward}")
         # print(f"Distance: {carenv.distance}")
-        print(f"info {info}")
-        print(f"obs {obs}")
+        # print(f"info {info}")
+        # print(f"obs {obs}")
+        print(carenv.data.geom_xpos)
 
