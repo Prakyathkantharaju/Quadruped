@@ -62,7 +62,7 @@ class CarEnv(mujoco_env.MujocoEnv):
     @property
     def _alive(self):
 
-        body_far_away = 3 < self.data.geom_xpos[6,1] < 0.5
+        body_far_away = 2.7 < self.data.geom_xpos[6,1] or self.data.geom_xpos[6,1]  < 0.5
         # dead if distance is a bit more than initial values.
         if (self.distance > 125) or (len(self.distance_store) > 200 and (np.mean(self.distance_store[-50:]) > np.mean(self.distance_store[-150:-50]))) \
         or (len(self.velocity_store) > 200 and np.mean(self.velocity_store[-5:]) < 0.001) or body_far_away:
@@ -212,5 +212,6 @@ if __name__ == "__main__":
         # print(f"Distance: {carenv.distance}")
         # print(f"info {info}")
         # print(f"obs {obs}")
-        print(carenv.data.geom_xpos)
+        print(carenv.data.geom_xpos[6,1])
+        print(3 < carenv.data.geom_xpos[6,1] or carenv.data.geom_xpos[6,1]  < 0.5)
 
