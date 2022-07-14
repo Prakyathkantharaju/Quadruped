@@ -6,6 +6,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 from torch import ShortTensor
+
+from mapping.mapping import Mapping
+
 np.set_printoptions(threshold=sys.maxsize)
 
 class CarEnv(mujoco_env.MujocoEnv):
@@ -148,20 +151,32 @@ if __name__ == "__main__":
         free = carenv.render(mode = "rgb_array")
         cv2.imshow('free', seg[1])
         cv2.imshow('seg', cv2.cvtColor(free, cv2.COLOR_RGB2BGR))
-        key = cv2.waitKey(0) & 0xFF
+        key = cv2.waitKey()
+        v_ref = 1
+        action_a = v_ref
+
+        mapping = Mapping()
+        speed,steering = mapping.get_actions(-1,-1)
+        print(action_a)
+        print('action',action_a)
+        carenv.step(np.array([steering, speed]))
+
         if key == ord("q"):
             break
-        if key == ord("w"):
-            obs, reward, _, _ = carenv.step(np.array([0, 1]))
-        elif key == ord ("a"):
-            obs, reward, _, _ = carenv.step(np.array([1, 0]))
-        elif key ==ord("d"):
-            obs, reward, _, _ = carenv.step(np.array([-1, 0]))
-        else:
-            obs, reward, _, _ = carenv.step(np.array([0, 0]))
-        if carenv._alive == False:
-            break
+        # if key == ord("w"):
+        #     obs, reward, _, _ = carenv.step(np.array([0, 1]))
+        # elif key == ord ("a"):
+        #     obs, reward, _, _ = carenv.step(np.array([1, 0]))
+        # elif key ==ord("d"):
+        #     obs, reward, _, _ = carenv.step(np.array([-1, 0]))
+        # elif  key == ord("s"):
+        #     obs, reward, _, _ = carenv.step(np.array([0, -1]))
+        # else:
+        #     obs, reward, _, _ = carenv.step(np.array([0, 0]))
+        # if carenv._alive == False:
+        #     break
 
-        print(f"Reward: {reward}")
-        print(f"On target: {carenv._on_target}")
-        print(f"obs {obs}")
+        # print(f"Reward: {reward}")
+        # print(f"On target: {carenv._on_target}")
+        # print(f"obs {obs}")
+        print('velocity',carenv.data.qvel[0])

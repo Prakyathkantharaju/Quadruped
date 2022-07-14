@@ -6,8 +6,8 @@ from typing import List, Tuple, Any
 class Mapping:
     """ mapping from COM to throttle and steering and other way around
     """
-    def __init__(self, action_range: np.ndarray, v_thr_range: np.ndarray,
-                 steering_range: np.ndarray, verbose: bool = False) -> None:
+    def __init__(self, action_range: np.ndarray = np.array([[-1, -1],[1, 1]]), v_thr_range: np.ndarray = np.array([-1, 1]),
+                 steering_range: np.ndarray = np.array([-1, 1]), verbose: bool = False) -> None:
         """
         action_range: range of action defined in the mujoco
         v_th_range: speed range the bot can move
@@ -34,23 +34,25 @@ class Mapping:
 
 
     def _optimize(self, v_x: float, v_y: float) -> List[Any]:
-        result = least_squares(self._find_vel_theta, x0 = self._old,
-                               args = (v_x, v_y)i, bounds = self._bounds)
+        result = least_squares(self._find_vel_theta, x0 = self._old, \
+                               args = (v_x, v_y), bounds = self._bounds)
         return result.x
 
     def _map_to_actions(self, speed: float, steering: float) -> Tuple[Any]:
         action_speed =  speed * ( self.v_thr_range[1] - self.v_thr_range[0])/\
-            (self.action[0,1] - self.action[0,0]) + self.action[0,0]
+            (self.action[0,0] - self.action[1,0]) + self.action[0,0]
         steering_speed = steering_speed * ( self.steering_range[1] - self.v_thr_range[0]) /\
-            (self.action[1,1] - self.action[1,0]) + self.action[1,0]
+            (self.action[0,1] - self.action[1,1]) + self.action[0,1]
 
         return action_speed, steering_speed
 
     def get_actions(self, v_x: float, v_y: float):
         speed_steering = self._optimize(v_x, v_y)
-        action_0, action_1 = self._map_to_actions(speed_steering[0],
-                                                  speed_steering[1])
-        return action_0, action_1
+        # action_0, action_1 = self._map_to_actions(speed_steering[0],
+        #                                           speed_steering[1])
+        self.old_v_thr = speed_steering[0]
+        self.old_steer = speed_steering[1]
+        return self.old_v_thr, self.old_steer
 
 
     def _find_vel_theta(self, x: np.ndarray, v_x: float, v_y: float) -> List:

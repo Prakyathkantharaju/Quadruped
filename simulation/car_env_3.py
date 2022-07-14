@@ -188,7 +188,7 @@ if __name__ == "__main__":
         reward += velocity * 0.01
         cv2.imshow('fulll', np.hstack((data, cv2.cvtColor(target, cv2.COLOR_GRAY2BGR), cv2.cvtColor(car, cv2.COLOR_GRAY2BGR))))
 
-
+        print(carenv.data.qvel[0])
 
         #
         free = carenv.render(mode = "rgb_array")
@@ -212,6 +212,6 @@ if __name__ == "__main__":
         # print(f"Distance: {carenv.distance}")
         # print(f"info {info}")
         # print(f"obs {obs}")
-        print(carenv.data.geom_xpos[6,1])
-        print(3 < carenv.data.geom_xpos[6,1] or carenv.data.geom_xpos[6,1]  < 0.5)
+        # print(carenv.data.geom_xpos[6,1])
+        # print(3 < carenv.data.geom_xpos[6,1] or carenv.data.geom_xpos[6,1]  < 0.5)
 
