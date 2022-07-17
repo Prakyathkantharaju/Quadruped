@@ -24,11 +24,11 @@
       <camera name="buddy_realsense_d435i" mode="fixed" pos="-0.005 0 .165" euler="0 4.712 4.712"/>
       <site name="buddy_imu" pos="-0.005 0 .165"/>
 
-      <site name="range_finder_1" pos="-0.005 0 .25" euler="0 1.77 0"/>
-      <site name="range_finder_2" pos="-0.005 0 .25" euler="0 1.67 0"/>
+      <!-- <site name="range_finder_1" pos="-0.05 0 .25" euler="0 1.77 0"/> -->
+      <!-- <site name="range_finder_2" pos="-0.005 0 .25" euler="0 1.67 0"/> -->
       <site name="range_finder_3" pos="-0.005 0 .25" euler="1 1.57 0" type="cylinder"/>
-      <site name="range_finder_4" pos="-0.005 0 .25" euler="0 1.47 0"/>
-      <site name="range_finder_5" pos="-0.005 0 .25" euler="0 1.37 0"/>
+    <site name="range_finder_4" pos="-0.005 0.1 .25" euler="0 1.57 0" type="cylinder"/>
+      <site name="range_finder_5" pos="-0.005 -0.1 .25" euler="0 1.57 0"/>
 
       <geom pos="0 0 0.094655" type="mesh" mass="3.542137" mesh="buddy_mushr_base_nano"/>
       <geom name="buddy_realsense_d435i" size="0.012525 0.045 0.0125" pos="0.0123949 0 0.162178" mass="0.072" type="box"/>
@@ -87,8 +87,8 @@
     </fixed>
   </tendon>
   <sensor>
-    <rangefinder name="range_finder_1" site="range_finder_1" cutoff = "10" />
-    <rangefinder name="range_finder_2" site="range_finder_2" cutoff = "10" />
+    <!-- <rangefinder name="range_finder_1" site="range_finder_1" cutoff = "10" /> -->
+    <!-- <rangefinder name="range_finder_2" site="range_finder_2" cutoff = "10" /> -->
     <rangefinder name="range_finder_3" site="range_finder_3" cutoff = "10" />
     <rangefinder name="range_finder_4" site="range_finder_4" cutoff = "10" />
     <rangefinder name="range_finder_5" site="range_finder_5" cutoff = "10" />
