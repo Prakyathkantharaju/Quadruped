@@ -3,7 +3,7 @@ from gym.envs.registration import register
 from stable_baselines3 import PPO, A2C, DDPG, TD3
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common import env_checker
-from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecVideoRecorder
+from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv
 
 from stable_baselines3.common.noise import NormalActionNoise, OrnsteinUhlenbeckActionNoise
 from stable_baselines3.common.utils import set_random_seed
@@ -88,7 +88,7 @@ if __name__ == '__main__':
     # check_env(env)
     train_env = DummyVecEnv(env_list)
     # train_env = SubprocVecEnv(env_list, start_method='fork')
-    train_env = VecVideoRecorder(train_env, f'./.run_logs/videos/{run.id}', record_video_trigger=lambda x: x % 10000 == 0, video_length = 5000)
+    #train_env = VecVideoRecorder(train_env, f'./.run_logs/videos/{run.id}', record_video_trigger=lambda x: x % 10000 == 0, video_length = 5000)
 
     train_env.reset()
 

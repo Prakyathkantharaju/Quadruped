@@ -12,7 +12,7 @@ from mapping.mapping import Mapping
 
 np.set_printoptions(threshold=sys.maxsize)
 DEFAULT_CAMERA_CONFIG = {
-    "distance": 20.0,
+    "distance": 30.0,
 }
 class CarEnv(mujoco_env.MujocoEnv):
     metadata = {
@@ -42,12 +42,12 @@ class CarEnv(mujoco_env.MujocoEnv):
         self.init_qpos = qpos
         self.init_qvel = qvel
         self.mapping = Mapping()
-        
+
 
         mujoco_env.MujocoEnv.__init__(
             self, self.model_path, frame_skip)
 
-        
+
 
     def _get_obs(self):
         excentric = self._excentric_obs()
@@ -56,8 +56,8 @@ class CarEnv(mujoco_env.MujocoEnv):
 
     def _excentric_obs(self):
         data = self.data.sensordata[:3]
-        # data = np.array([1 if c > 1 else 0 for c in data ])
-        return data 
+        data = np.array([1 if c > 1 else 0 for c in data ])
+        return data
 
     def _incentric_obs(self):
         data = self.data.sensordata[3:9]
@@ -85,10 +85,10 @@ class CarEnv(mujoco_env.MujocoEnv):
         or (len(self.distance_store) > 100 and  self.distance_store[-1] < max(self.distance_store) * 0.9) or  \
             np.min(self.data.sensordata[:3]) < 0.7:
             return False
-        else: 
+        else:
             return True
 
-    
+
 
     def _set_action_space(self):
         self.action_space = Box(low=-10.0, high=10.0, shape=(2,), dtype=np.float32)
@@ -98,12 +98,12 @@ class CarEnv(mujoco_env.MujocoEnv):
         if self._i < 2:
             self.start_position = np.copy(self.data.xpos[1])
             actual_position = np.array([0, 0 , 0])
-        else: 
+        else:
             actual_position = np.copy(self.data.xpos[1]) - self.start_position
             # print(actual_position)
         self._i += 1
         self.cur_action = action
-        
+
         throtle, steering = self.mapping.get_actions(action[0], action[1], actual_position)
         action = np.array([steering, throtle])
         self.do_simulation(action, self.frame_skip)
@@ -132,7 +132,7 @@ class CarEnv(mujoco_env.MujocoEnv):
 
 
         return self._get_obs()
-    
+
     def viewer_setup(self):
         for key, value in DEFAULT_CAMERA_CONFIG.items():
             if isinstance(value, np.ndarray):
@@ -153,23 +153,23 @@ def euler_from_quaternion(quat):
         t0 = +2.0 * (w * x + y * z)
         t1 = +1.0 - 2.0 * (x * x + y * y)
         roll_x = math.atan2(t0, t1)
-    
+
         t2 = +2.0 * (w * y - z * x)
         t2 = +1.0 if t2 > +1.0 else t2
         t2 = -1.0 if t2 < -1.0 else t2
         pitch_y = math.asin(t2)
-    
+
         t3 = +2.0 * (w * z + x * y)
         t4 = +1.0 - 2.0 * (y * y + z * z)
         yaw_z = math.atan2(t3, t4)
-    
+
         return roll_x, pitch_y, yaw_z # in radians
 
 
 if __name__ == "__main__":
     carenv = CarEnv("/home/prakyathkantharaju/gitfolder/personal/Quadruped/simulation/models/distance_simple_2.xml")
-    # carenv.viewer.cam.distance = carenv.viewer.cam.distance * 0.3   
-    
+    # carenv.viewer.cam.distance = carenv.viewer.cam.distance * 0.3
+
     i = 0
     # carenv.step(np.array([0, 0]))
     mapping = Mapping()
