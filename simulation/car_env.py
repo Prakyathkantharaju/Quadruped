@@ -12,7 +12,7 @@ from mapping.mapping import Mapping
 
 np.set_printoptions(threshold=sys.maxsize)
 DEFAULT_CAMERA_CONFIG = {
-    "distance": 4.0,
+    "distance": 12.0,
 }
 class CarEnv(mujoco_env.MujocoEnv):
     metadata = {
@@ -33,6 +33,7 @@ class CarEnv(mujoco_env.MujocoEnv):
         # self.action_space = Box(low=-1.0, high=1.0, shape=(2,), dtype=np.float32)
         self._i = 0
         self.velocity_store = []
+        self.reward_store = []
         self.zero_vel_coutner = 0
         qpos = [0, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         qvel = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -78,18 +79,25 @@ class CarEnv(mujoco_env.MujocoEnv):
 
     def _get_reward(self):
         reward = 0
-        reward += self._on_target * 0.1
-        reward += self._on_target * self.data.qvel[0] * 0.01
+        # reward += self._on_target * 0.1
+        reward += self._on_target * self.data.qvel[0] * 0.1
+        distance_traveled = np.copy(self.data.xpos[1]) - self.start_position
+        reward += distance_traveled[0] 
+        # print(reward)
+        reward -= np.sqrt(self.cur_action[0] ** 2 + self.cur_action[1] ** 2) * 0.011
+        self.reward_store.append(reward)
+        return reward
 
-        # give reward only when going forward
-        if np.mean(self.velocity_store[:-5]) > 0.001:
-            return reward
-        else:
-            return reward - 0.1
+        # # give reward only when going forward
+        # if np.mean(self.velocity_store[:-5]) > 0.001:
+        #     return reward
+        # else:
+        #     return reward - 0.1
 
     @property
     def _alive(self):
-        if not self._on_target or (len(self.velocity_store) > 100 and np.mean(np.abs(self.velocity_store[-100:])) < 0.02):
+        distance_traveled = np.copy(self.data.xpos[1]) - self.start_position
+        if distance_traveled[0] < -0.2 or not self._on_target or (len(self.velocity_store) > 100 and np.mean(np.abs(self.velocity_store[-100:])) < 0.02):
             return False
         else: 
             return True
@@ -113,7 +121,7 @@ class CarEnv(mujoco_env.MujocoEnv):
             actual_position = np.array([0, 0 , 0])
         else: 
             actual_position = np.copy(self.data.xpos[1]) - self.start_position
-            print(actual_position)
+            # print(actual_position)
         self._i += 1
         self.cur_action = action
         
@@ -126,10 +134,10 @@ class CarEnv(mujoco_env.MujocoEnv):
         self.velocity_store.append(self.data.qvel[0])
         
         if done:
-            print(f"{self._i} reward: {reward}, alive {self._alive}, on target {self._on_target}, actions {self.cur_action}")
-        if self._i > 1000:
+            print(f"{self._i} reward: {sum(self.reward_store)}, alive {self._alive}, on target {self._on_target}, actions {self.cur_action}")
+        if self._i > 5000:
             # reward = 1000
-            print(f"{self._i} reward: {reward}, alive {self._alive}, on target {self._on_target}, actions {self.cur_action}")
+            print(f"{self._i} reward: {sum(self.reward_store)}, alive {self._alive}, on target {self._on_target}, actions {self.cur_action}")
             done = True
 
         return excentric_observation, reward, done, {'reward': reward, 'isalive': self._alive, 'ontarget': self._on_target}
@@ -144,12 +152,12 @@ class CarEnv(mujoco_env.MujocoEnv):
 
         return self._get_obs()
     
-    # def viewer_setup(self):
-    #     for key, value in DEFAULT_CAMERA_CONFIG.items():
-    #         if isinstance(value, np.ndarray):
-    #             getattr(self.viewer.cam, key)[:] = value
-    #         else:
-    #             setattr(self.viewer.cam, key, value)
+    def viewer_setup(self):
+        for key, value in DEFAULT_CAMERA_CONFIG.items():
+            if isinstance(value, np.ndarray):
+                getattr(self.viewer.cam, key)[:] = value
+            else:
+                setattr(self.viewer.cam, key, value)
 
 
 

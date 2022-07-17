@@ -38,34 +38,34 @@ from car_env import CarEnv
 
 # wandb config
 config = {
-	"policy_type": "MlpPolicy",
-	"total_timesteps": 1000,
-	"env_name": "car_env_v1",
+    "policy_type": "MlpPolicy",
+    "total_timesteps": 5000,
+    "env_name": "car_env_v1",
 }
 
 gym.envs.register(
      id='car-robot-v1',
      entry_point='car_env:CarEnv',
-     max_episode_steps=1000,
-	 kwargs={'model_path': path}
+     max_episode_steps=5000,
+     kwargs={'model_path': path}
 )
 
 
-gym.envs.register(
-     id='car-robot-left-v1',
-     entry_point='car_env:CarEnv',
-     max_episode_steps=2000,
-	 kwargs={'model_path': path_2}
-)
+# gym.envs.register(
+#      id='car-robot-left-v1',
+#      entry_point='car_env:CarEnv',
+#      max_episode_steps=2000,
+# 	 kwargs={'model_path': path_2}
+# )
 
 # env.render()
 
 run = wandb.init(
-	project="hopper-env",
-	config=config,
-	sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
-	monitor_gym=True,  # auto-upload the videos of agents playing the game
-	save_code=True,  # optional
+    project="hopper-env",
+    config=config,
+    sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
+    monitor_gym=True,  # auto-upload the videos of agents playing the game
+    save_code=True,  # optional
     name="PPO-car-env-v2",
 )
 
@@ -73,51 +73,51 @@ run = wandb.init(
 
 
 def make_env(seed=0):
-	"""
-	Create a wrapped, monitored SubprocVecEnv for Hopper
-	"""
-	def _init():
-		# env.reset()
+    """
+    Create a wrapped, monitored SubprocVecEnv for Hopper
+    """
+    def _init():
+        # env.reset()
 
-		env = gym.make('car-robot-v1')
-		print(f"env seed: {seed}")
-		return Monitor(env)
+        env = gym.make('car-robot-v1')
+        print(f"env seed: {seed}")
+        return Monitor(env)
 
-	set_random_seed(seed)
-	return _init
+    set_random_seed(seed)
+    return _init
 
-def make_env_2(seed=0):
-	"""
-	Create a wrapped, monitored SubprocVecEnv for Hopper
-	"""
-	def _init():
-		# env.reset()
+# def make_env_2(seed=0):
+# 	"""
+# 	Create a wrapped, monitored SubprocVecEnv for Hopper
+# 	"""
+# 	def _init():
+# 		# env.reset()
 
-		env = gym.make('car-robot-left-v1')
-		print(f"env seed: {seed}")
-		return Monitor(env)
+# 		env = gym.make('car-robot-left-v1')
+# 		print(f"env seed: {seed}")
+# 		return Monitor(env)
 
-	set_random_seed(seed)
-	return _init
+# 	set_random_seed(seed)
+# 	return _init
 
 
 if __name__ == '__main__':
-	env_list = [make_env(0), make_env_2(120)]
+    env_list = [make_env(0)]
 
-	# check_env(env)
-	train_env = DummyVecEnv(env_list)
-	# train_env = SubprocVecEnv(env_list, start_method='fork')
-	train_env = VecVideoRecorder(train_env, f'./.run_logs/videos/{run.id}', record_video_trigger=lambda x: x % 100000 == 0, video_length = 20000)
+    # check_env(env)
+    train_env = DummyVecEnv(env_list)
+    # train_env = SubprocVecEnv(env_list, start_method='fork')
+    train_env = VecVideoRecorder(train_env, f'./.run_logs/videos/{run.id}', record_video_trigger=lambda x: x % 100000 == 0, video_length = 5000)
 
-	train_env.reset()
+    train_env.reset()
 
-	model = PPO("MlpPolicy", train_env, tensorboard_log=f"./.run_logs/logs/{run.id}", device="cuda", normalize_advantage=True,
-	create_eval_env=True)
-	# model.load("Models_parkour_large_1")
+    model = PPO("MlpPolicy", train_env, tensorboard_log=f"./.run_logs/logs/{run.id}", device="cuda", normalize_advantage=True,
+    create_eval_env=True)
+    # model.load("Models_parkour_large_1")
 
-	model.learn(total_timesteps=5000000, log_interval=1, callback=WandbCallback(gradient_save_freq=1000,  model_save_freq=1000,
-									model_save_path=f"./.run_logs/models/{run.id}", verbose=2))
+    model.learn(total_timesteps=500000, log_interval=1, callback=WandbCallback(gradient_save_freq=10000,  model_save_freq=10000,
+                                    model_save_path=f"./.run_logs/models/{run.id}", verbose=2))
 
 
-	model.save(f"./.run_logs/full_model.pkl")
-	run.finish()
+    model.save(f"./.run_logs/full_model.pkl")
+    run.finish()
