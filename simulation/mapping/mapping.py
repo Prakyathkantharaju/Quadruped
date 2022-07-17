@@ -6,8 +6,8 @@ from typing import List, Tuple, Any
 class Mapping:
     """ mapping from COM to throttle and steering and other way around
     """
-    def __init__(self, action_range: np.ndarray = np.array([[-1, -1],[1, 1]]), v_thr_range: np.ndarray = np.array([-1, 0.5]),
-                 steering_range: np.ndarray = np.array([-1, 0.5]), verbose: bool = False) -> None:
+    def __init__(self, action_range: np.ndarray = np.array([[-1, -1],[1, 1]]), v_thr_range: np.ndarray = np.array([-0.5, 0.5]),
+                 steering_range: np.ndarray = np.array([-0.5, 0.5]), verbose: bool = False) -> None:
         """
         action_range: range of action defined in the mujoco
         v_th_range: speed range the bot can move
@@ -57,7 +57,7 @@ class Mapping:
             actual_angle = 0.0
 
         desired_angle = np.tan(desired_position[1]/desired_position[0])
-        print(desired_position)
+        # print(desired_position)
         # v_x, v_y, w = np.array([actual_position[0],actual_position[0] + 0.03 ]), \
         #             np.array([actual_position[1], actual_position[1] + 0.03]), np.array([actual_angle, desired_angle])
         w = (desired_angle - actual_angle) / 0.01

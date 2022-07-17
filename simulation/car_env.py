@@ -29,11 +29,17 @@ class CarEnv(mujoco_env.MujocoEnv):
     def __init__(self, model_path, frame_skip=1, **kwargs):
         self.model_path = model_path
         self.frame_skip = frame_skip
-        observation_space = Box(low=-10, high=10, shape=(1, 10), dtype=np.float32)
-        self.action_space = Box(low=-1.0, high=1.0, shape=(2,), dtype=np.float32)
+        # observation_space = Box(low=-10, high=10, shape=(1, 10), dtype=np.float32)
+        # self.action_space = Box(low=-1.0, high=1.0, shape=(2,), dtype=np.float32)
         self._i = 0
         self.velocity_store = []
         self.zero_vel_coutner = 0
+        qpos = [0, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        qvel = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        self.init_qpos = qpos
+        self.init_qvel = qvel
+        self.mapping = Mapping()
+        
 
         mujoco_env.MujocoEnv.__init__(
             self, self.model_path, frame_skip)
@@ -50,16 +56,20 @@ class CarEnv(mujoco_env.MujocoEnv):
     def _excentric_obs(self):
         data = self.render(mode = "rgb_array",width = 300, height=300, camera_name="buddy_realsense_d435i")
         data = cv2.cvtColor(data, cv2.COLOR_RGB2BGR)
-        seg =  cv2,inRange(data, (0, 0, 50), (50, 50,255))
-        short_snip = seg[1][220:280, 70:230]
+        seg =  cv2.inRange(data, (0, 0, 50), (50, 50,255))
+        short_snip = seg[220:280, 70:230]
 
         # cv2.imshow('wtf', short_snip)
         # cv2.rectangle(data,  (70, 225), (230, 280), (0, 0, 255), 2)
         # cv2.imshow("snip", data)
-        short_snip = np.mean(short_snip, axis = 1)
-        self.short_snip = short_snip
-        short_snip  =  np.split(short_snip, 10)
+        # cv2.imshow("seg", np.mean(short_snip, axis=0))
+        # print(short_snip.shape)
         short_snip = np.mean(short_snip, axis = 0)
+        short_snip  =  np.split(short_snip, 20)
+        short_snip = [np.mean(c) for c in short_snip]
+        # short_snip = np.mean(short_snip, axis = 0)
+        # print(short_snip)
+        self.short_snip = short_snip
         return short_snip
 
     def _incentric_obs(self):
@@ -79,7 +89,7 @@ class CarEnv(mujoco_env.MujocoEnv):
 
     @property
     def _alive(self):
-        if len(self.velocity_store) > 100 and np.mean(np.abs(self.velocity_store[-100:])) < 0.02:
+        if not self._on_target or (len(self.velocity_store) > 100 and np.mean(np.abs(self.velocity_store[-100:])) < 0.02):
             return False
         else: 
             return True
@@ -88,14 +98,27 @@ class CarEnv(mujoco_env.MujocoEnv):
 
     @property
     def _on_target(self):
-        if (np.sum(self.short_snip) > 2):
+        if (np.sum(self.short_snip) > 100):
             return True
         else:
             return False
 
+    def _set_action_space(self):
+        self.action_space = Box(low=-10.0, high=10.0, shape=(2,), dtype=np.float32)
+
+
     def step(self, action):
+        if self._i < 2:
+            self.start_position = np.copy(self.data.xpos[1])
+            actual_position = np.array([0, 0 , 0])
+        else: 
+            actual_position = np.copy(self.data.xpos[1]) - self.start_position
+            print(actual_position)
         self._i += 1
         self.cur_action = action
+        
+        throtle, steering = self.mapping.get_actions(action[0], action[1], actual_position)
+        action = np.array([steering, throtle])
         self.do_simulation(action, self.frame_skip)
         excentric_observation = self._get_obs()
         reward = self._get_reward()
@@ -116,8 +139,7 @@ class CarEnv(mujoco_env.MujocoEnv):
         self.velocity_store = []
         self.zero_vel_coutner = 0
 
-        mujoco_env.MujocoEnv.__init__(
-            self, self.model_path, self.frame_skip)
+        self.set_state(self.init_qpos, self.init_qvel)
 
 
         return self._get_obs()
@@ -158,26 +180,36 @@ def euler_from_quaternion(quat):
 if __name__ == "__main__":
     carenv = CarEnv("/home/prakyathkantharaju/gitfolder/personal/Quadruped/simulation/models/block.xml")
     carenv.viewer.cam.distance = carenv.viewer.cam.distance * 0.3   
+    
     i = 0
-    carenv.step(np.array([0, 0]))
+    # carenv.step(np.array([0, 0]))
     mapping = Mapping()
     start_position = np.copy(carenv.data.xpos[1])
     start_angle = euler_from_quaternion(np.copy(carenv.data.xquat[1]))
-    print(start_position)
+
 
     while True:
         i += 1
         free = carenv.render("rgb_array")
         cv2.imshow("free", free)
+        carenv.step(np.array([4, 0]))
 
-        # print(free)
-        actual_position = np.array(carenv.data.xpos[1]) - np.array(start_position)
-        print(f"{i}. Actual position {actual_position}")
-        speed,steering = mapping.get_actions(1, 1,actual_position)
-        print(f"{i}. Speed {speed} Steering {steering}")
-        carenv.step(np.array([steering, speed]))
+        # # print(free)
+        # actual_position = np.array(carenv.data.xpos[1]) - np.array(start_position)
+        # # if i < 200:
+        # #     speed,steering = mapping.get_actions(1, 1,actual_position)
+        # # elif i < 300:
+        # #     speed,steering = mapping.get_actions(1, -1,actual_position)
+        # # elif i < 400:
+        # #     speed,steering = mapping.get_actions(1, 0,actual_position)
+        # # elif i < 500:
+        # #     speed,steering = mapping.get_actions(0, 0,actual_position)
+        # steering = 0
+        # speed = 0
+        # print(f"{i}. Actual position {actual_position} Speed {speed} Steering {steering}")
+        # carenv.step(np.array([steering, speed]))
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-        if i > 1000:
-            break
+        # if i > 500:
+        #     break
