@@ -34,6 +34,7 @@ class CarEnv(mujoco_env.MujocoEnv):
         self._i = 0
         self.velocity_store = []
         self.reward_store = []
+        self.distance_store = []
         self.prev_position = np.array([0, 0 , 0])
         self.zero_vel_coutner = 0
         qpos = [0, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -49,25 +50,29 @@ class CarEnv(mujoco_env.MujocoEnv):
         
 
     def _get_obs(self):
-        # excentric = self._excentric_obs()
-
+        excentric = self._excentric_obs()
         incentric = self._incentric_obs()
-        return incentric
+        return np.concatenate([excentric, incentric])
 
+    def _excentric_obs(self):
+        data = self.data.sensordata[:3]
+        # data = np.array([1 if c > 1 else 0 for c in data ])
+        return data 
 
     def _incentric_obs(self):
-        data = self.data.sensordata[:9]
+        data = self.data.sensordata[3:9]
         return data
 
     def _get_reward(self):
         reward = 0
         # reward += self._on_target * 0.1
-        reward +=  self.data.qvel[1] * 0.1
+        # reward +=  self.data.qvel[1] * 0.1
         actual_position = np.copy(self.data.xpos[1]) - self.start_position
         distance_traveled = actual_position[0] - self.prev_position[0]
-        reward += distance_traveled
+        reward += actual_position[0]
+        reward += distance_traveled * 10
         # print(reward)
-        reward -= np.sqrt(self.cur_action[0] ** 2 + self.cur_action[1] ** 2) * 0.0001
+        # reward -= np.sqrt(self.cur_action[0] ** 2 + self.cur_action[1] ** 2) * 0.00001
         self.reward_store.append(reward)
         return reward
 
@@ -76,7 +81,9 @@ class CarEnv(mujoco_env.MujocoEnv):
     @property
     def _alive(self):
         distance_traveled = np.copy(self.data.xpos[1]) - self.start_position
-        if distance_traveled[0] < -0.2 or (len(self.velocity_store) > 50 and np.mean(np.abs(self.velocity_store[-25:])) < 0.02):
+        if distance_traveled[0] < -0.1 or (len(self.velocity_store) > 50 and np.mean(np.abs(self.velocity_store[-25:])) < 0.02) \
+        or (len(self.distance_store) > 100 and  self.distance_store[-1] < max(self.distance_store) * 0.9) or  \
+            np.min(self.data.sensordata[:3]) < 0.7:
             return False
         else: 
             return True
@@ -105,7 +112,7 @@ class CarEnv(mujoco_env.MujocoEnv):
         done = not self._alive
         self.velocity_store.append(self.data.qvel[0])
         self.prev_position = actual_position
-        
+        self.distance_store.append(actual_position[0])
         if done:
             print(f"{self._i} reward: {sum(self.reward_store)}, alive {self._alive}, distance {actual_position[0]}, actions {self.cur_action}")
         if self._i > 5000:
@@ -118,6 +125,7 @@ class CarEnv(mujoco_env.MujocoEnv):
     def reset_model(self):
         self._i = 0
         self.velocity_store = []
+        self.distance_store = []
         self.zero_vel_coutner = 0
 
         self.set_state(self.init_qpos, self.init_qvel)
@@ -174,7 +182,7 @@ if __name__ == "__main__":
         free = carenv.render("rgb_array")
         cv2.imshow("free", free)
         _, reward, _, _ = carenv.step(np.array([4, 0]))
-        print(sum(carenv.reward_store))
+        print(np.min(carenv.data.sensordata[:3]))
         # print(carenv.data.sensordata[:9])
 
         # # print(free)
