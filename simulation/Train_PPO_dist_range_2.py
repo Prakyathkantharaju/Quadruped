@@ -37,14 +37,14 @@ from car_env import CarEnv
 # wandb config
 config = {
     "policy_type": "MlpPolicy",
-    "total_timesteps": 5000,
+    "total_timesteps": 10000,
     "env_name": "car_env_v1",
 }
 
 gym.envs.register(
      id='car-robot-distance-range',
      entry_point='car_env_4:CarEnv',
-     max_episode_steps=5000,
+     max_episode_steps=10000,
      kwargs={'model_path': path}
 )
 
@@ -95,7 +95,7 @@ if __name__ == '__main__':
     model = PPO("MlpPolicy", train_env, tensorboard_log=f"./.run_logs/logs/{run.id}", device="cuda", normalize_advantage=True,create_eval_env=True)
     # model.load("Models_parkour_large_1")
 
-    model.learn(total_timesteps=1000000, log_interval=1, callback=WandbCallback(gradient_save_freq=10000,  model_save_freq=10000,
+    model.learn(total_timesteps=50000000, log_interval=1, callback=WandbCallback(gradient_save_freq=10000,  model_save_freq=10000,
                                     model_save_path=f"./.run_logs/models/{run.id}", verbose=2))
 
 
