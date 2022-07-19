@@ -19,7 +19,14 @@
  ## Line follower robot controller using com velocity using PPO.
 
 
+https://user-images.githubusercontent.com/34353557/179654395-5e33acfe-4c98-4276-8e11-ed2f4bb82b56.mp4
+
+
 
  ## Obstacle avoidance.
+
+https://user-images.githubusercontent.com/34353557/179654498-de3be2b6-272b-43c2-955d-8af4689d759b.mp4
+
+
 
 
