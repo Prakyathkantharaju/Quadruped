@@ -29,4 +29,13 @@ https://user-images.githubusercontent.com/34353557/179654498-de3be2b6-272b-43c2-
 
 
 
+## Notes:
+
+### old model.
+- peanlize yaw. and maximize the speed .
+$v$ -> maximize v.
+$\omega$ -> mimize
+
+### new model.
+
 
