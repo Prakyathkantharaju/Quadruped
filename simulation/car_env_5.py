@@ -98,7 +98,7 @@ class CarEnv(mujoco_env.MujocoEnv):
     @property
     def _alive(self):
         distance_traveled = np.copy(self.data.xpos[1]) - self.start_position
-        if distance_traveled[0] < -0.05 or not self._on_target or (len(self.velocity_store) > 100 and np.mean(np.abs(self.velocity_store[-100:])) < 0.02):
+        if distance_traveled[0] < -0.05 or (not self._on_target) or (len(self.velocity_store) > 100 and np.mean(np.abs(self.velocity_store[-100:])) < 0.02):
             return False
         else: 
             return True
@@ -132,7 +132,7 @@ class CarEnv(mujoco_env.MujocoEnv):
         self.do_simulation(action, self.frame_skip)
         excentric_observation = self._get_obs()
         reward = self._get_reward()
-        done = not self._alive
+        done = not self._alive 
         self.velocity_store.append(self.data.qvel[0])
         self.prev_position = np.copy(self.data.xpos[1])
         
@@ -148,6 +148,7 @@ class CarEnv(mujoco_env.MujocoEnv):
     def reset_model(self):
         self._i = 0
         self.velocity_store = []
+        self.reward_store = []
         self.zero_vel_coutner = 0
 
         self.set_state(self.init_qpos, self.init_qvel)
