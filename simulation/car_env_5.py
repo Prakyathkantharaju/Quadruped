@@ -143,7 +143,7 @@ class CarEnv(mujoco_env.MujocoEnv):
             print(f"{self._i} reward: {sum(self.reward_store)}, alive {self._alive}, on target {self._on_target}, actions {self.cur_action}, 'id': {self.id}")
             done = True
 
-        return excentric_observation, reward, done, {'reward': reward, 'isalive': self._alive, 'ontarget': self._on_target, 'id': self.id}
+        return excentric_observation, reward, done, {'reward': reward, 'isalive': self._alive, 'ontarget': self._on_target, 'id': self.id, 'distance' :actual_position[0]}
 
     def reset_model(self):
         self._i = 0

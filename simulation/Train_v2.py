@@ -91,7 +91,7 @@ def make_env(seed=0):
 
         env = gym.make('car-robot-v1')
         print(f"env seed: {seed}")
-        return Monitor(env , info_keywords=('reward', 'distance','episode_length'), filename=f'.run_logs/logs/{run.id}_1')
+        return Monitor(env , info_keywords=('reward', 'distance','episode_length', 'id'), filename=f'.run_logs/logs/{run.id}_1')
 
     set_random_seed(seed)
     return _init
@@ -105,7 +105,7 @@ def make_env_2(seed=0):
 
 		env = gym.make('car-robot-v2')
 		print(f"env seed: {seed}")
-		return Monitor(env, info_keywords=('reward', 'distance','episode_length'), filename=f'.run_logs/logs/{run.id}_2')
+		return Monitor(env, info_keywords=('reward', 'distance','episode_length', 'id'), filename=f'.run_logs/logs/{run.id}_2')
 
 	set_random_seed(seed)
 	return _init
@@ -119,7 +119,7 @@ def make_env_3(seed=0):
 
 		env = gym.make('car-robot-v3')
 		print(f"env seed: {seed}")
-		return Monitor(env, info_keywords=('reward', 'distance','episode_length'), filename=f'.run_logs/logs/{run.id}_3')
+		return Monitor(env, info_keywords=('reward', 'distance','episode_length', 'id'), filename=f'.run_logs/logs/{run.id}_3')
 
 	set_random_seed(seed)
 	return _init
