@@ -60,9 +60,9 @@ class CarEnv(mujoco_env.MujocoEnv):
         seg =  cv2.inRange(data, (0, 0, 50), (50, 50,255))
         short_snip = seg[220:280, 70:230]
 
-        # cv2.imshow('wtf', short_snip)
+        cv2.imshow('wtf', short_snip)
         # cv2.rectangle(data,  (70, 225), (230, 280), (0, 0, 255), 2)
-        # cv2.imshow("snip", data)
+        cv2.imshow("snip", data)
         # cv2.imshow("seg", np.mean(short_snip, axis=0))
         # print(short_snip.shape)
         short_snip = np.mean(short_snip, axis = 0)
@@ -200,7 +200,7 @@ if __name__ == "__main__":
         i += 1
         free = carenv.render("rgb_array")
         cv2.imshow("free", free)
-        carenv.step(np.array([4, 0]))
+        # carenv.step(np.array([4, 0]))
 
         # # print(free)
         # actual_position = np.array(carenv.data.xpos[1]) - np.array(start_position)
