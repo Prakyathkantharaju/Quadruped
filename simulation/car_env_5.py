@@ -26,7 +26,8 @@ class CarEnv(mujoco_env.MujocoEnv):
         "render_fps": 20,
     }
 
-    def __init__(self, model_path, frame_skip=1, weights = [0.1, 1, 0.001, 0.1], **kwargs):
+    def __init__(self, model_path,id = 1, frame_skip=1, weights = [0.1, 1, 0.001, 0.1], **kwargs):
+        self.id = id
         self.model_path = model_path
         self.frame_skip = frame_skip
         self._i = 0
@@ -136,13 +137,13 @@ class CarEnv(mujoco_env.MujocoEnv):
         self.prev_position = np.copy(self.data.xpos[1])
         
         if done:
-            print(f"{self._i} reward: {sum(self.reward_store)}, alive {self._alive}, on target {self._on_target}, actions {self.cur_action}")
+            print(f"{self._i} reward: {sum(self.reward_store)}, alive {self._alive}, on target {self._on_target}, actions {self.cur_action}, 'id': {self.id}")
         if self._i > 5000:
             # reward = 1000
-            print(f"{self._i} reward: {sum(self.reward_store)}, alive {self._alive}, on target {self._on_target}, actions {self.cur_action}")
+            print(f"{self._i} reward: {sum(self.reward_store)}, alive {self._alive}, on target {self._on_target}, actions {self.cur_action}, 'id': {self.id}")
             done = True
 
-        return excentric_observation, reward, done, {'reward': reward, 'isalive': self._alive, 'ontarget': self._on_target}
+        return excentric_observation, reward, done, {'reward': reward, 'isalive': self._alive, 'ontarget': self._on_target, 'id': self.id}
 
     def reset_model(self):
         self._i = 0
