@@ -26,11 +26,9 @@ class CarEnv(mujoco_env.MujocoEnv):
         "render_fps": 20,
     }
 
-    def __init__(self, model_path, frame_skip=1, **kwargs):
+    def __init__(self, model_path, frame_skip=1, weights = [0.1, 1, 0.001, 0.1], **kwargs):
         self.model_path = model_path
         self.frame_skip = frame_skip
-        # observation_space = Box(low=-10, high=10, shape=(1, 10), dtype=np.float32)
-        # self.action_space = Box(low=-1.0, high=1.0, shape=(2,), dtype=np.float32)
         self._i = 0
         self.velocity_store = []
         self.reward_store = []
@@ -40,6 +38,7 @@ class CarEnv(mujoco_env.MujocoEnv):
         self.init_qpos = qpos
         self.init_qvel = qvel
         self.mapping = Mapping()
+        self.weights = weights
         
 
         mujoco_env.MujocoEnv.__init__(
@@ -49,8 +48,9 @@ class CarEnv(mujoco_env.MujocoEnv):
 
     def _get_obs(self):
         excentric = self._excentric_obs()
-        incentric = self._incentric_obs()
-        return np.concatenate([excentric, incentric])
+        # incentric = self._incentric_obs()
+        # return np.concatenate([excentric, incentric])
+        return excentric
 
 
 
@@ -71,6 +71,7 @@ class CarEnv(mujoco_env.MujocoEnv):
         # short_snip = np.mean(short_snip, axis = 0)
         # print(short_snip)
         self.short_snip = short_snip
+        short_snip = np.array([1 if c > 10 else 0 for c in short_snip])
         return short_snip
 
     def _incentric_obs(self):
@@ -79,25 +80,24 @@ class CarEnv(mujoco_env.MujocoEnv):
 
     def _get_reward(self):
         reward = 0
-        # reward += self._on_target * 0.1
-        reward += self._on_target * self.data.qvel[0] * 0.1
-        distance_traveled = np.copy(self.data.xpos[1]) - self.start_position
-        reward += distance_traveled[0] 
-        # print(reward)
-        reward -= np.sqrt(self.cur_action[0] ** 2 + self.cur_action[1] ** 2) * 0.011
+        # alive reward
+        reward += self.weights[0] * self._alive
+        distance_traveled = np.copy(self.data.xpos[1]) - self.prev_position
+        # forward velocity reward
+        reward += self.weights[1] * self._on_target * distance_traveled[0] / 0.01
+        # lateral velocity cost
+        reward -= self.weights[2] * self._on_target * distance_traveled[1] / 0.01
+        # action cost
+        reward -= self.weights[3] * np.sqrt(self.cur_action[0] ** 2 + self.cur_action[1] ** 2)
         self.reward_store.append(reward)
         return reward
 
-        # # give reward only when going forward
-        # if np.mean(self.velocity_store[:-5]) > 0.001:
-        #     return reward
-        # else:
-        #     return reward - 0.1
+
 
     @property
     def _alive(self):
         distance_traveled = np.copy(self.data.xpos[1]) - self.start_position
-        if distance_traveled[0] < -0.2 or not self._on_target or (len(self.velocity_store) > 100 and np.mean(np.abs(self.velocity_store[-100:])) < 0.02):
+        if distance_traveled[0] < -0.05 or not self._on_target or (len(self.velocity_store) > 100 and np.mean(np.abs(self.velocity_store[-100:])) < 0.02):
             return False
         else: 
             return True
@@ -118,6 +118,7 @@ class CarEnv(mujoco_env.MujocoEnv):
     def step(self, action):
         if self._i < 2:
             self.start_position = np.copy(self.data.xpos[1])
+            self.prev_position = 0
             actual_position = np.array([0, 0 , 0])
         else: 
             actual_position = np.copy(self.data.xpos[1]) - self.start_position
@@ -132,6 +133,7 @@ class CarEnv(mujoco_env.MujocoEnv):
         reward = self._get_reward()
         done = not self._alive
         self.velocity_store.append(self.data.qvel[0])
+        self.prev_position = np.copy(self.data.xpos[1])
         
         if done:
             print(f"{self._i} reward: {sum(self.reward_store)}, alive {self._alive}, on target {self._on_target}, actions {self.cur_action}")
@@ -200,24 +202,8 @@ if __name__ == "__main__":
         i += 1
         free = carenv.render("rgb_array")
         cv2.imshow("free", free)
-        # carenv.step(np.array([4, 0]))
+        obs, _, _, _ = carenv.step(np.array([4, 2]))
 
-        # # print(free)
-        # actual_position = np.array(carenv.data.xpos[1]) - np.array(start_position)
-        # # if i < 200:
-        # #     speed,steering = mapping.get_actions(1, 1,actual_position)
-        # # elif i < 300:
-        # #     speed,steering = mapping.get_actions(1, -1,actual_position)
-        # # elif i < 400:
-        # #     speed,steering = mapping.get_actions(1, 0,actual_position)
-        # # elif i < 500:
-        # #     speed,steering = mapping.get_actions(0, 0,actual_position)
-        # steering = 0
-        # speed = 0
-        # print(f"{i}. Actual position {actual_position} Speed {speed} Steering {steering}")
-        # carenv.step(np.array([steering, speed]))
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-        # if i > 500:
-        #     break
