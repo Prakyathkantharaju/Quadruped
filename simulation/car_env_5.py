@@ -40,12 +40,12 @@ class CarEnv(mujoco_env.MujocoEnv):
         self.init_qvel = qvel
         self.mapping = Mapping()
         self.weights = weights
-        
+
 
         mujoco_env.MujocoEnv.__init__(
             self, self.model_path, frame_skip)
 
-        
+
 
     def _get_obs(self):
         excentric = self._excentric_obs()
@@ -100,10 +100,10 @@ class CarEnv(mujoco_env.MujocoEnv):
         distance_traveled = np.copy(self.data.xpos[1]) - self.start_position
         if distance_traveled[0] < -0.05 or (not self._on_target) or (len(self.velocity_store) > 100 and np.mean(np.abs(self.velocity_store[-100:])) < 0.02):
             return False
-        else: 
+        else:
             return True
 
-    
+
 
     @property
     def _on_target(self):
@@ -121,26 +121,26 @@ class CarEnv(mujoco_env.MujocoEnv):
             self.start_position = np.copy(self.data.xpos[1])
             self.prev_position = 0
             actual_position = np.array([0, 0 , 0])
-        else: 
+        else:
             actual_position = np.copy(self.data.xpos[1]) - self.start_position
             # print(actual_position)
         self._i += 1
         self.cur_action = action
-        
+
         throtle, steering = self.mapping.get_actions(action[0], action[1], actual_position)
         action = np.array([steering, throtle])
         self.do_simulation(action, self.frame_skip)
         excentric_observation = self._get_obs()
         reward = self._get_reward()
-        done = not self._alive 
+        done = not self._alive
         self.velocity_store.append(self.data.qvel[0])
         self.prev_position = np.copy(self.data.xpos[1])
-        
+
         if done:
-            print(f"{self._i} reward: {sum(self.reward_store)}, alive {self._alive}, on target {self._on_target}, actions {self.cur_action}, 'id': {self.id}")
+            print(f"{self._i} reward: {sum(self.reward_store)}, alive {self._alive}, on target {self._on_target}, actions {self.cur_action}, 'id': {self.id}, distance {actual_position[0]}")
         if self._i > 5000:
             # reward = 1000
-            print(f"{self._i} reward: {sum(self.reward_store)}, alive {self._alive}, on target {self._on_target}, actions {self.cur_action}, 'id': {self.id}")
+            print(f"{self._i} reward: {sum(self.reward_store)}, alive {self._alive}, on target {self._on_target}, actions {self.cur_action}, 'id': {self.id}, distance {actual_position[0]}")
             done = True
 
         return excentric_observation, reward, done, {'reward': reward, 'isalive': self._alive, 'ontarget': self._on_target, 'episode_length': self._i, 'id': self.id, 'distance' :actual_position[0]}
@@ -155,7 +155,7 @@ class CarEnv(mujoco_env.MujocoEnv):
 
 
         return self._get_obs()
-    
+
     def viewer_setup(self):
         for key, value in DEFAULT_CAMERA_CONFIG.items():
             if isinstance(value, np.ndarray):
@@ -176,23 +176,23 @@ def euler_from_quaternion(quat):
         t0 = +2.0 * (w * x + y * z)
         t1 = +1.0 - 2.0 * (x * x + y * y)
         roll_x = math.atan2(t0, t1)
-    
+
         t2 = +2.0 * (w * y - z * x)
         t2 = +1.0 if t2 > +1.0 else t2
         t2 = -1.0 if t2 < -1.0 else t2
         pitch_y = math.asin(t2)
-    
+
         t3 = +2.0 * (w * z + x * y)
         t4 = +1.0 - 2.0 * (y * y + z * z)
         yaw_z = math.atan2(t3, t4)
-    
+
         return roll_x, pitch_y, yaw_z # in radians
 
 
 if __name__ == "__main__":
     carenv = CarEnv("/home/prakyathkantharaju/gitfolder/personal/Quadruped/simulation/models/block.xml")
-    carenv.viewer.cam.distance = carenv.viewer.cam.distance * 0.3   
-    
+    carenv.viewer.cam.distance = carenv.viewer.cam.distance * 0.3
+
     i = 0
     # carenv.step(np.array([0, 0]))
     mapping = Mapping()
