@@ -204,7 +204,7 @@ if __name__ == "__main__":
         i += 1
         free = carenv.render("rgb_array")
         cv2.imshow("free", free)
-        obs, _, _, _ = carenv.step(np.array([4, 2]))
+        obs, _, _, _ = carenv.step(np.array([4, 0]))
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
