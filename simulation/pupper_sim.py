@@ -1,6 +1,6 @@
 import numpy as np
-import mujoco_py as mj
-from mujoco_py import load_model_from_path, MjSim, MjViewer
+import mujoco as mj
+from mujoco import load_model_from_path, MjSim, MjViewer
 # from StanfordQuadruped.src.State import State
 from dm_control import mujoco
 
