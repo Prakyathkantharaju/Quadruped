@@ -15,10 +15,9 @@ import warnings
 warnings.filterwarnings("ignore")
 from stable_baselines3.common.env_checker import check_env
 
-# # load wandb
-import wandb
-from wandb.integration.sb3 import WandbCallback
 
+# for creating video
+import imageio
 
 # from mujoco_py import GlfwContext
 # GlfwContext(offscreen=True)
@@ -70,14 +69,6 @@ gym.envs.register(
 )
 # env.render()
 
-run = wandb.init(
-    project="hopper-env",
-    config=config,
-    sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
-    monitor_gym=True,  # auto-upload the videos of agents playing the game
-    save_code=True,  # optional
-    name="PPO-car-env-v5",
-)
 
 
 
@@ -135,15 +126,21 @@ if __name__ == '__main__':
 
     env = gym.make('car-robot-v3')
     obs = env.reset()
+    vector = []
     for i in range(4000):
         action, _states = model.predict(obs)
         obs, rewards, done, info = env.step(action)
-        env.render()
+        vector.append(env.render(mode='rgb_array'))
         print(info)
         if done:
             obs = env.reset()
             print("done")
             break
+
+    writer  = imageio.get_writer(f'.run_logs/videos/v3.mp4', fps=int(1/0.01))
+    for i in vector:
+        writer.append_data(i)
+    writer.close()
 
 
 
