@@ -33,8 +33,12 @@ class QuadEnv(mujoco_env.MujocoEnv):
         self.velocity_store = []
         self.reward_store = []
         self.zero_vel_coutner = 0
-        qpos = [0, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        qvel = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        qpos = [ 1.26380959e-02, -1.93520817e-20,  2.70184157e-01,  9.99856514e-01,
+                -3.94014488e-17, -1.69396306e-02,  1.07566683e-17, -1.40534017e-01,
+                 2.27655496e-01, -2.36804402e-01,  1.40534017e-01,  2.27655496e-01,
+                -2.36804402e-01, -1.36392236e-01,  2.24462620e-01, -2.38664272e-01,
+                 1.36392236e-01,  2.24462620e-01, -2.38664272e-01]
+        qvel = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0,0,0]
         ctrl = [-0.12295051,  0.4353823,  -1.09235373,  0.12295051,  0.4353823,  -1.09235373,
                 -0.12295051,  0.4353823,  -1.09235373,  0.12295051,  0.4353823,  -1.09235373]
         self.ctrl = ctrl
@@ -45,7 +49,7 @@ class QuadEnv(mujoco_env.MujocoEnv):
 
 
         mujoco_env.MujocoEnv.__init__(
-            self, self.model_path, frame_skip, mujoco_bindings="mujoco_py")
+            self, self.model_path, frame_skip)
 
 
 
