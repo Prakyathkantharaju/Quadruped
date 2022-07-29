@@ -12,7 +12,7 @@ from mapping.mapping import Mapping
 
 np.set_printoptions(threshold=sys.maxsize)
 DEFAULT_CAMERA_CONFIG = {
-    "distance": 12.0,
+    "distance": 20.0,
 }
 class CarEnv(mujoco_env.MujocoEnv):
     metadata = {

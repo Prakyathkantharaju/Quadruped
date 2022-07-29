@@ -83,55 +83,61 @@ def make_env(seed=0):
 
         env = gym.make('car-robot-v1')
         print(f"env seed: {seed}")
-        return Monitor(env , info_keywords=('reward', 'distance','episode_length', 'id'), filename=f'.run_logs/logs/{run.id}_1')
+        # return Monitor(env , info_keywords=('reward', 'distance','episode_length', 'id'), filename=f'.run_logs/logs/{run.id}_1')
+        return env
 
     set_random_seed(seed)
     return _init
 
 def make_env_2(seed=0):
-	"""
-	Create a wrapped, monitored SubprocVecEnv for Hopper
-	"""
-	def _init():
-		# env.reset()
+    """
+    Create a wrapped, monitored SubprocVecEnv for Hopper
+    """
+    def _init():
+        # env.reset()
 
-		env = gym.make('car-robot-v2')
-		print(f"env seed: {seed}")
-		return Monitor(env, info_keywords=('reward', 'distance','episode_length', 'id'), filename=f'.run_logs/logs/{run.id}_2')
+        env = gym.make('car-robot-v2')
+        print(f"env seed: {seed}")
+        # return Monitor(env, info_keywords=('reward', 'distance','episode_length', 'id'), filename=f'.run_logs/logs/{run.id}_2')
+        return env
 
-	set_random_seed(seed)
-	return _init
+    set_random_seed(seed)
+    return _init
 
 def make_env_3(seed=0):
-	"""
-	Create a wrapped, monitored SubprocVecEnv for Hopper
-	"""
-	def _init():
-		# env.reset()
+    """
+    Create a wrapped, monitored SubprocVecEnv for Hopper
+    """
+    def _init():
+        # env.reset()
 
-		env = gym.make('car-robot-v3')
-		print(f"env seed: {seed}")
-		return Monitor(env, info_keywords=('reward', 'distance','episode_length', 'id'), filename=f'.run_logs/logs/{run.id}_3')
+        env = gym.make('car-robot-v3')
+        print(f"env seed: {seed}")
+        # return env
+        # return Monitor(env, info_keywords=('reward', 'distance','episode_length', 'id'), filename=f'.run_logs/logs/{run.id}_3')
+        return env
 
-	set_random_seed(seed)
-	return _init
+    set_random_seed(seed)
+    return _init
 
 
 if __name__ == '__main__':
     env_list = [make_env(0), make_env_2(1), make_env_3(2)]
+    env = gym.make('car-robot-v1')
+    env.reset()
+    # train_env = SubprocVecEnv(env_list, start_method='fork')
 
-    PATH = "/home/prakyathkantharaju/gitfolder/personal/Quadruped/simulation/models/1tp97qwb/model.zip"
-    # PATH = "/home/prakyathkantharaju/gitfolder/personal/Quadruped/simulation/models/20lvlk5x/model.zip"
-    model = PPO("MlpPolicy", 'car-robot-v3', verbose=1) 
-    model.load(PATH)
-    mean_reward, std_reward = evaluate_policy(model, model.get_env(), n_eval_episodes=10)
+    # PATH = "/home/prakyathkantharaju/gitfolder/personal/Quadruped/simulation/models/1tp97qwb/model.zip"
+    PATH = "/home/prakyathkantharaju/gitfolder/personal/Quadruped/simulation/.other/full_model_new.pkl"
+    model = PPO.load(PATH)
+    mean_reward, std_reward = evaluate_policy(model, env , n_eval_episodes=10, render=True)
 
     print(f"mean reward: {mean_reward}")
     print(f"std reward: {std_reward}")
     
     # model.eval()
 
-    env = model.get_env()
+    # env = make_env_2(1)         
     obs = env.reset()
     vector = []
     for i in range(4000):
@@ -142,7 +148,7 @@ if __name__ == '__main__':
         if done:
             obs = env.reset()
             print("done")
-            break
+            # break
 
     writer  = imageio.get_writer(f'.run_logs/videos/v3.mp4', fps=int(1/0.01))
     for i in vector:
