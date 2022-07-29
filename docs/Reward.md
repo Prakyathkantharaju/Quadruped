@@ -69,4 +69,5 @@ https://user-images.githubusercontent.com/34353557/181777815-2f4b3b18-4ab2-40ab-
 
 THe main idea:
 $\begin{pmatrix} \dot{X_g} \\ \dot{Y_g} \end{pmatrix} = \begin{bmatrix} \cos(\theta) & -\sin(\theta) \\ \sin(\theta) & \cos(\theta) \end{bmatrix} \cdot \begin{pmatrix} \dot{X_b} \\ \dot{Y_b} \end{pmatrix}$
-![image](https://user-images.githubusercontent.com/34353557/181780591-48a5b500-3b68-4ef5-b843-ac9f7b385486.png)
+![image](https://user-images.githubusercontent.com/34353557/181780805-060b6f83-2fe1-49e8-80ef-cf16fc98231b.png)
+
