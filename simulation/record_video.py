@@ -7,6 +7,7 @@ from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecVide
 
 from stable_baselines3.common.noise import NormalActionNoise, OrnsteinUhlenbeckActionNoise
 from stable_baselines3.common.utils import set_random_seed
+from stable_baselines3.common.evaluation import evaluate_policy
 #import sys and set the path
 import sys, os
 import numpy as np
@@ -119,19 +120,25 @@ def make_env_3(seed=0):
 if __name__ == '__main__':
     env_list = [make_env(0), make_env_2(1), make_env_3(2)]
 
-    PATH = ""
+    PATH = "/home/prakyathkantharaju/gitfolder/personal/Quadruped/simulation/models/1tp97qwb/model.zip"
+    # PATH = "/home/prakyathkantharaju/gitfolder/personal/Quadruped/simulation/models/20lvlk5x/model.zip"
     model = PPO("MlpPolicy", 'car-robot-v3', verbose=1) 
     model.load(PATH)
-    model.eval()
+    mean_reward, std_reward = evaluate_policy(model, model.get_env(), n_eval_episodes=10)
 
-    env = gym.make('car-robot-v3')
+    print(f"mean reward: {mean_reward}")
+    print(f"std reward: {std_reward}")
+    
+    # model.eval()
+
+    env = model.get_env()
     obs = env.reset()
     vector = []
     for i in range(4000):
         action, _states = model.predict(obs)
         obs, rewards, done, info = env.step(action)
         vector.append(env.render(mode='rgb_array'))
-        print(info)
+        # print(info)
         if done:
             obs = env.reset()
             print("done")
