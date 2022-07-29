@@ -60,6 +60,13 @@ Here Weight is controlled by the hyperparameter `reward_weights` ($w = [w_1, w_2
    2. IF the distance traveled in recent 10 iteration is less than, the last 10th iteration. ( `mean(distance[-10:]) > distance[-1]` )
 
 
+https://user-images.githubusercontent.com/34353557/181777815-2f4b3b18-4ab2-40ab-9286-ad6bab660b3d.mp4
+
+
+
 
 ### QuadEnv
-TODO
+
+THe main idea:
+$\begin{pmatrix} \dot{X_g} \\ \dot{Y_g} \end{pmatrix} = \begin{bmatrix} \cos(\theta) & -\sin(\theta) \\ \sin(\theta) & \cos(\theta) \end{bmatrix} \cdot \begin{pmatrix} \dot{X_b} \\ \dot{Y_b} \end{pmatrix}$
+![image](https://user-images.githubusercontent.com/34353557/181780591-48a5b500-3b68-4ef5-b843-ac9f7b385486.png)
