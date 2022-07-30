@@ -139,7 +139,7 @@ if __name__ == '__main__':
     create_eval_env=True)
     # model.load("Models_parkour_large_1")
 
-    model.learn(total_timesteps=200000, log_interval=1, callback=WandbCallback(gradient_save_freq=10000,  model_save_freq=100000,
+    model.learn(total_timesteps=1000000, log_interval=1, callback=WandbCallback(gradient_save_freq=10000,  model_save_freq=100000,
                                     model_save_path=f"./.run_logs/models/{run.id}", verbose=2))
 
 
