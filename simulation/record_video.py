@@ -12,6 +12,9 @@ from stable_baselines3.common.evaluation import evaluate_policy
 import sys, os
 import numpy as np
 
+
+import matplotlib.pyplot as plt
+
 import warnings
 warnings.filterwarnings("ignore")
 from stable_baselines3.common.env_checker import check_env
@@ -130,30 +133,56 @@ if __name__ == '__main__':
     # PATH = "/home/prakyathkantharaju/gitfolder/personal/Quadruped/simulation/models/1tp97qwb/model.zip"
     PATH = "/home/prakyathkantharaju/gitfolder/personal/Quadruped/simulation/.other/full_model_new.pkl"
     model = PPO.load(PATH)
-    mean_reward, std_reward = evaluate_policy(model, env , n_eval_episodes=10, render=True)
+    # mean_reward, std_reward = evaluate_policy(model, env , n_eval_episodes=10, render=True)
 
-    print(f"mean reward: {mean_reward}")
-    print(f"std reward: {std_reward}")
+    # print(f"mean reward: {mean_reward}")
+    # print(f"std reward: {std_reward}")
     
     # model.eval()
 
     # env = make_env_2(1)         
     obs = env.reset()
     vector = []
+    action_history_1 = []
+    action_history_2 = []
+    buffer_store = []
+    fig, ax = plt.subplots(2,2)
     for i in range(4000):
         action, _states = model.predict(obs)
+        action_history_1.append(action[0])
+        action_history_2.append(action[1])
         obs, rewards, done, info = env.step(action)
-        vector.append(env.render(mode='rgb_array'))
+        vector.append(env.render(mode='rgb_array',width = 300, height=300, camera_name="buddy_realsense_d435i"))
+        ax[0,0].imshow(vector[i])
+        ax[0,1].plot(obs, label = 'obs')
+        ax[1,0].plot(action_history_1, label = 'x_dot', c ='r')
+        ax[1,0].legend()
+        ax[1,1].plot(action_history_2, c = 'g',  label = 'y_dot')
+        ax[1,1].legend()
+        # plt.legend()
+        plt.pause(0.00001)
+        plt.draw()
+        
+        w, h = fig.canvas.get_width_height()
+        buffer_store.append(np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8).reshape(h, w, 3))
         # print(info)
+        ax[0,1].cla()
+        ax[1,0].cla()
+        ax[1,1].cla()
+        ax[0,0].cla()
+
         if done:
             obs = env.reset()
             print("done")
             # break
 
-    writer  = imageio.get_writer(f'.run_logs/videos/v3.mp4', fps=int(1/0.01))
-    for i in vector:
+    writer  = imageio.get_writer(f'.run_logs/videos/v3_pov.mp4', fps=int(1/0.01))
+    for i in buffer_store:
         writer.append_data(i)
     writer.close()
+
+    # plt.plot(action_history)
+    # plt.show()
 
 
 

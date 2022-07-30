@@ -25,13 +25,14 @@ class CarEnv(mujoco_env.MujocoEnv):
         "render_fps": 20,
     }
 
-    def __init__(self, model_path,id = 1, frame_skip=1, weights = [0.1, 1, 0.001, 0.1], **kwargs):
+    def __init__(self, model_path,id = 1, frame_skip=1, weights = [0.1, 1, 0.001, 0.1, 0.0001], **kwargs):
         self.id = id
         self.model_path = model_path
         self.frame_skip = frame_skip
         self._i = 0
         self.velocity_store = []
         self.reward_store = []
+        self.action_store = []
         self.zero_vel_coutner = 0
         qpos = [0, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         qvel = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -89,6 +90,12 @@ class CarEnv(mujoco_env.MujocoEnv):
         reward -= self.weights[2] * self._on_target * distance_traveled[1] / 0.01
         # action cost
         reward -= self.weights[3] * np.sqrt(self.cur_action[0] ** 2 + self.cur_action[1] ** 2)
+        # rate of change in action cost
+        action_history = np.array(self.action_store[-10:])
+        print(action_history)
+        action_rate_0 = np.diff(action_history[:, 0]) / 0.01
+        action_rate_1 = np.diff(action_history[:, 1]) / 0.01
+        reward -= self.weights[4] * np.sqrt(np.mean(action_rate_0 ** 2) + np.mean(action_rate_1 ** 2))
         self.reward_store.append(reward)
         return reward
 
@@ -116,6 +123,7 @@ class CarEnv(mujoco_env.MujocoEnv):
 
 
     def step(self, action):
+        self.action_store.append(action)
         if self._i < 2:
             self.start_position = np.copy(self.data.xpos[1])
             self.prev_position = 0
@@ -148,6 +156,7 @@ class CarEnv(mujoco_env.MujocoEnv):
         self._i = 0
         self.velocity_store = []
         self.reward_store = []
+        self.action_store = []
         self.zero_vel_coutner = 0
 
         self.set_state(self.init_qpos, self.init_qvel)
