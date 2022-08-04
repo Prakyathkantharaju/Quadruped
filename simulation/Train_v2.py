@@ -143,5 +143,5 @@ if __name__ == '__main__':
                                     model_save_path=f"./.run_logs/models/{run.id}", verbose=2))
 
 
-    model.save(f"./.run_logs/full_model_new.pkl")
+    model.save(f"./.run_logs/full_model_new_cost.pkl")
     run.finish()

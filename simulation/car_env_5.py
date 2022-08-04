@@ -25,7 +25,7 @@ class CarEnv(mujoco_env.MujocoEnv):
         "render_fps": 20,
     }
 
-    def __init__(self, model_path,id = 1, frame_skip=1, weights = [0.1, 1, 0.001, 0.1, 0.01], **kwargs):
+    def __init__(self, model_path,id = 1, frame_skip=1, weights = [0.1, 1, 0.001, 0.1, 0.001], **kwargs):
         self.id = id
         self.model_path = model_path
         self.frame_skip = frame_skip
@@ -93,9 +93,19 @@ class CarEnv(mujoco_env.MujocoEnv):
         # rate of change in action cost
         action_history = np.array(self.action_store[-10:])
 
-        action_rate_0 = np.diff(action_history[:, 0]) / 0.01
-        action_rate_1 = np.diff(action_history[:, 1]) / 0.01
-        reward -= self.weights[4] * np.sqrt(np.mean(action_rate_0 ** 2) + np.mean(action_rate_1 ** 2))
+        if len(action_history[:,0]) > 5:
+            action_rate_0 = np.diff(action_history[:, 0]) / 0.01
+            action_rate_1 = np.diff(action_history[:, 1]) / 0.01
+            cost_diff = self.weights[4] * np.sqrt(np.mean(action_rate_0 ** 2) + np.mean(action_rate_1 ** 2))
+        else:
+            cost_diff = self.weights[4] * 1 # Here 100 is a cost I am trying
+
+        if np.isnan(cost_diff):
+            print(cost_diff)
+            print(action_history.shape)
+            print(action_history, action_rate_0, action_rate_1)
+        reward -= cost_diff
+
         self.reward_store.append(reward)
         return reward
 

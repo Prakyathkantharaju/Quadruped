@@ -131,7 +131,7 @@ if __name__ == '__main__':
     # train_env = SubprocVecEnv(env_list, start_method='fork')
 
     # PATH = "/home/prakyathkantharaju/gitfolder/personal/Quadruped/simulation/models/1tp97qwb/model.zip"
-    PATH = "/home/prakyathkantharaju/gitfolder/personal/Quadruped/simulation/.other/full_model_new.pkl"
+    PATH = "/home/prakyath/github/personal/Quadruped/simulation/.run_logs/full_model_new_cost.pkl"
     model = PPO.load(PATH)
     # mean_reward, std_reward = evaluate_policy(model, env , n_eval_episodes=10, render=True)
 
