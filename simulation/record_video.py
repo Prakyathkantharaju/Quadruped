@@ -126,7 +126,7 @@ def make_env_3(seed=0):
 
 if __name__ == '__main__':
     env_list = [make_env(0), make_env_2(1), make_env_3(2)]
-    env = gym.make('car-robot-v1')
+    env = gym.make('car-robot-v3')
     env.reset()
     # train_env = SubprocVecEnv(env_list, start_method='fork')
 
@@ -157,8 +157,11 @@ if __name__ == '__main__':
         ax[0,1].plot(obs, label = 'obs')
         ax[1,0].plot(action_history_1, label = 'x_dot', c ='r')
         ax[1,0].legend()
+        ax[1,0].set_ylim([-1, 1])
         ax[1,1].plot(action_history_2, c = 'g',  label = 'y_dot')
         ax[1,1].legend()
+        ax[1,1].set_ylim([-1, 1])
+        
         # plt.legend()
         plt.pause(0.00001)
         plt.draw()
@@ -176,7 +179,7 @@ if __name__ == '__main__':
             print("done")
             # break
 
-    writer  = imageio.get_writer(f'.run_logs/videos/v3_pov.mp4', fps=int(1/0.01))
+    writer  = imageio.get_writer(f'.run_logs/videos/v3_path_4.mp4', fps=int(1/0.01))
     for i in buffer_store:
         writer.append_data(i)
     writer.close()
