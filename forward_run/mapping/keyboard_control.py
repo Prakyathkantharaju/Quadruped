@@ -1,5 +1,6 @@
 from UDPComms import Publisher
-import pygame
+from UDPComms import Scope
+import time
 
 def direction_helper(trigger, opt1, opt2):
     if trigger == opt1:
@@ -18,47 +19,15 @@ def direction_helper(opt1, opt2):
 
 class keyboard_control:
     def __init__(self) -> None:
-        self.pub = Publisher(8830)
-        pygame.init()
-        pygame.display.init()
+        self.pub = Publisher(8830, Scope.BROADCAST)
         self.MESSAGE_RATE = 20
-        win = pygame.display.set_mode((500,250))
-
-        pygame.font.init()
-        font = pygame.font.SysFont("Arial", 20)
-        text_surface = font.render("Click to enable.", False, (220,0,0))
-        win.fill((255,255,255))
-        win.blit(text_surface, (40,100))
-
-
-
-
-if __name__ == "__main__":
-    pub = Publisher(8830)
-
-    pygame.init()
-    pygame.display.init()
-    MESSAGE_RATE = 20
-    win = pygame.display.set_mode((500,250))
-
-    pygame.font.init()
-    font = pygame.font.SysFont("Arial", 20)
-    text_surface = font.render("Click to enable.", False, (220,0,0))
-    win.fill((255,255,255))
-    win.blit(text_surface, (40,100))
-
-
-    rx_ = 0.0
-    ry_ = 0.0
-    lx_ = 0.0
-    ly_ = 0.0
-    l_alpha = 0.15
-    r_alpha = 0.3
-
-    while True:
-        pygame.event.pump()
-        
-        msg = {
+        self.rx_ = 0.0
+        self.ry_ = 0.0
+        self.lx_ = 0.0
+        self.ly_ = 0.0
+        self.l_alpha = 0.15
+        self.r_alpha = 0.3
+        self.msg = {
             "ly": 0,
             "lx": 0,
             "rx": 0,
@@ -73,36 +42,26 @@ if __name__ == "__main__":
             "square": 0,
             "circle": 0,
             "triangle": 0,
-            "message_rate": MESSAGE_RATE,
-        }
-        if not pygame.key.get_focused():
-            print("Application not in focus! Click the application window to re-enable control.")
-        else:
-            key = pygame.key.get_pressed()
-            msg = {}
-            lx_ = l_alpha * direction_helper(key[pygame.K_a], key[pygame.K_d]) + (1 - l_alpha) * lx_
-            msg["lx"] = lx_
-            ly_ = l_alpha * direction_helper(key[pygame.K_s], key[pygame.K_w]) + (1 - l_alpha) * ly_
-            msg["ly"] = ly_
-            rx_ = r_alpha * direction_helper(key[pygame.K_LEFT], key[pygame.K_RIGHT]) + (1 - r_alpha) * rx_
-            msg["rx"] = rx_
-            ry_ = r_alpha * direction_helper(key[pygame.K_DOWN], key[pygame.K_UP]) + (1 - r_alpha) * ry_
-            msg["ry"] = ry_
-            msg["x"] = 1 if key[pygame.K_x] else 0
-            msg["square"] = 1 if key[pygame.K_u] else 0
-            msg["circle"] = 1 if key[pygame.K_c] else 0
-            msg["triangle"] = 1 if key[pygame.K_t] else 0
-            msg["dpady"] = 1.0 * direction_helper(key[pygame.K_k], key[pygame.K_i])
-            msg["dpadx"] = 1.0 * direction_helper(key[pygame.K_j], key[pygame.K_l])
-            msg["L1"] = 1 if key[pygame.K_q] else 0
-            msg["R1"] = 1 if key[pygame.K_e] else 0
-            msg["L2"] = 0
-            msg["R2"] = 0
-            msg["message_rate"] = MESSAGE_RATE
-            print(msg)
-        
-        pub.send(msg)
-        pygame.display.flip()
-        pygame.time.wait(int(1000/MESSAGE_RATE))
+            "message_rate": self.MESSAGE_RATE
+            }
 
-    
+    def send_start(self):
+        self.msg['L1'] = 1
+        self.pub.send(self.msg)
+        time.sleep(int(1000 / self.MESSAGE_RATE))
+
+    def send_controller(self, xdot: float, ydot: float) -> None:
+        # TODO Check the X and Y velocity in the controller
+        # TODO change the mulitplication factory the receiving code
+        self.msg['ly'] = xdot
+        self.msg['lx'] = ydot
+        self.pub.send(self.msg)
+        time.sleep(int(1000 / self.MESSAGE_RATE))
+
+
+if __name__ == "__main__":
+
+    keyboard = keyboard_control() 
+    keyboard.send_start()
+    keyboard.send_controller(0, 0)
+

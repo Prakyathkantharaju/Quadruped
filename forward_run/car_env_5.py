@@ -8,7 +8,7 @@ import cv2
 import math
 
 
-from mapping.mapping import Mapping
+from forward_run.mapping.mapping import Mapping
 
 np.set_printoptions(threshold=sys.maxsize)
 DEFAULT_CAMERA_CONFIG = {
