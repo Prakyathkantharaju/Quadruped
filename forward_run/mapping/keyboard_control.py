@@ -1,5 +1,8 @@
 from UDPComms import Publisher
 from UDPComms import Scope
+
+
+import numpy as np
 import time
 
 def direction_helper(trigger, opt1, opt2):
@@ -27,6 +30,10 @@ class keyboard_control:
         self.ly_ = 0.0
         self.l_alpha = 0.15
         self.r_alpha = 0.3
+        self._reset_msg()
+
+
+    def _create_msg(self):
         self.msg = {
             "ly": 0,
             "lx": 0,
@@ -45,18 +52,34 @@ class keyboard_control:
             "message_rate": self.MESSAGE_RATE
             }
 
-    def send_start(self):
-        self.msg['L1'] = 1
+    def _reset_msg(self):
+        self._create_msg()
         self.pub.send(self.msg)
-        time.sleep(int(1000 / self.MESSAGE_RATE))
+        time.sleep(int(1 / self.MESSAGE_RATE))
+
+    def send_start(self):
+        self._create_msg()
+        self.msg["L1"] = 1
+        self.pub.send(self.msg)
+        time.sleep(int(1 / self.MESSAGE_RATE))
+
+    def start_trot(self):
+        self._create_msg()
+        self.msg["R1"] = 1
+        self.pub.send(self.msg)
+        time.sleep(int(1 / self.MESSAGE_RATE))
+
+    def send_no_command(self):
+        self._reset_msg()
+
 
     def send_controller(self, xdot: float, ydot: float) -> None:
-        # TODO Check the X and Y velocity in the controller
-        # TODO change the mulitplication factory the receiving code
-        self.msg['ly'] = xdot
-        self.msg['lx'] = ydot
+        print(f"sending the {xdot}, {ydot}")
+        # ONGOING change the mulitplication factory the receiving code
+        self.msg['ly'] = np.clip(xdot, -0.5, +0.5)
+        self.msg['lx'] = np.clip(ydot, -0.5, +0.5)
         self.pub.send(self.msg)
-        time.sleep(int(1000 / self.MESSAGE_RATE))
+        time.sleep(int(1 / self.MESSAGE_RATE))
 
 
 if __name__ == "__main__":

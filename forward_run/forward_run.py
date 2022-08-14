@@ -15,8 +15,8 @@ import numpy.typing as npt
 
 class controller:
 
-    def __init__(self, PPO_path: str = "/home/prakyathkantharaju/gitfolder/personal/Quadruped/forward_run/full_model_new_cost.pkl",
-    model_path: str = "/home/prakyathkantharaju/gitfolder/personal/Quadruped/simulation/models/block.xml") -> None:
+    def __init__(self, PPO_path: str = "/home/prakyath/github/personal/Quadruped/forward_run/full_model_new_cost.pkl",
+    model_path: str = "/home/prakyath/github/personal/Quadruped/simulation/models/block.xml") -> None:
         gym.envs.register(
              id='car-robot-v1',
              entry_point='forward_run.car_env_5:CarEnv',
@@ -39,4 +39,3 @@ if __name__ == "__main__":
     controller()
 
 
-    

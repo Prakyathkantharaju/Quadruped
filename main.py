@@ -22,6 +22,10 @@ class Control_robot:
         # keyboard
         self.keyboard = keyboard_control()
 
+
+        # start_ controller
+        self.START = False
+
     def main(self):
         while True:
             obs = self.sensor.get_obs()
@@ -29,18 +33,28 @@ class Control_robot:
             action = self.controller.forward(obs)
             print(obs, action)
             k = cv2.waitKey(1)
-            
-            if k%256 == 27:
+
+            if k % 256 == 27:
                 # ESC pressed
                 print("Escape hit, closing...")
                 break
 
+            if k == ord('q'):
+                print("initializing the robot")
+                self.keyboard.send_start()
 
+            if k == ord('e'):
+                print("starting the trot gait")
+                self.keyboard.start_trot()
 
+                self.START = True
 
+            if self.START:
+                self.keyboard.send_controller(action[0], action[1])
+
+            
 
 if __name__ == "__main__":
     robot = Control_robot()
-    robot.main()  
-
-    
+    robot.main()
+ 
