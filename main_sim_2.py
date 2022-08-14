@@ -1,13 +1,11 @@
-import time
-import sys, os
+import sys
+import os
+import math
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-sys.path.insert(1,"StanfordQuadruped")
-
-
-import math
+sys.path.insert(1, "StanfordQuadruped")
 
 from StanfordQuadruped.src.Controller import Controller
 from StanfordQuadruped.src.State import State
@@ -19,38 +17,42 @@ from StanfordQuadruped.src.State import BehaviorState
 
 
 def euler_from_quaternion(quat):
-        """
+
+    """
         Convert a quaternion into euler angles (roll, pitch, yaw)
         roll is rotation around x in radians (counterclockwise)
         pitch is rotation around y in radians (counterclockwise)
         yaw is rotation around z in radians (counterclockwise)
-        """
-        x,y,z,w = quat[0], quat[1], quat[2], quat[3]
-        t0 = +2.0 * (w * x + y * z)
-        t1 = +1.0 - 2.0 * (x * x + y * y)
-        roll_x = math.atan2(t0, t1)
-    
-        t2 = +2.0 * (w * y - z * x)
-        t2 = +1.0 if t2 > +1.0 else t2
-        t2 = -1.0 if t2 < -1.0 else t2
-        pitch_y = math.asin(t2)
-    
-        t3 = +2.0 * (w * z + x * y)
-        t4 = +1.0 - 2.0 * (y * y + z * z)
-        yaw_z = math.atan2(t3, t4)
-    
-        return roll_x, pitch_y, yaw_z # in radians
+    """
+    x, y, z, w = quat[0], quat[1], quat[2], quat[3]
+    t0 = +2.0 * (w * x + y * z)
+    t1 = +1.0 - 2.0 * (x * x + y * y)
+    roll_x = math.atan2(t0, t1)
+
+    t2 = +2.0 * (w * y - z * x)
+    t2 = +1.0 if t2 > +1.0 else t2
+    t2 = -1.0 if t2 < -1.0 else t2
+    pitch_y = math.asin(t2)
+
+    t3 = +2.0 * (w * z + x * y)
+    t4 = +1.0 - 2.0 * (y * y + z * z)
+    yaw_z = math.atan2(t3, t4)
+
+    return roll_x, pitch_y, yaw_z      # in radians
 
 def main():
-    """ Main program
+
+    """ 
+        Main program
     """
     config = Configuration()
     controller = Controller(config, four_legs_inverse_kinematics)
     state = State()
     state.quat_orientation = np.array([1, 0, 0, 0])
     command = Command()
-    path  = os.getcwd() + "/simulation/assets/pupper_out.xml"
+    path_ = os.getcwd() + "/simulation/assets/pupper_out.xml"
     pupper = QuadEnv(path)
+
 
     pupper.reset()
 
@@ -134,9 +136,6 @@ def main():
     np.savetxt("simulation/joint_angles.csv", store_data)
     plt.show()
     # sys,exit()
-
-
-
 
 
 
