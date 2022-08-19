@@ -74,10 +74,10 @@ class keyboard_control:
 
 
     def send_controller(self, xdot: float, ydot: float) -> None:
-        print(f"sending the {xdot}, {ydot}")
+        # print(f"sending the {xdot}, {ydot}")
         # ONGOING change the mulitplication factory the receiving code
-        self.msg['ly'] = np.clip(xdot, -0.5, +0.5)
-        self.msg['lx'] = np.clip(ydot, -0.5, +0.5)
+        self.msg['ly'] = np.clip(xdot, -0.8, +0.8)
+        self.msg['lx'] = np.clip(ydot, -0.8, +0.8)
         self.pub.send(self.msg)
         #time.sleep(int(1 / self.MESSAGE_RATE))
 
