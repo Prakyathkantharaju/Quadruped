@@ -11,6 +11,8 @@ from forward_run.mapping.keyboard_control import keyboard_control
 from perception.main_perception import perception
 
 
+#TODO have a logger for ths recording the error and safety compaints.
+
 class Control_robot:
     def __init__(self) -> None:
         # main perception
@@ -47,10 +49,17 @@ class Control_robot:
                 print("starting the trot gait")
                 self.keyboard.start_trot()
 
-                self.START = True
+                
+            if k == ord('s'):
+                # stopping and starting the controller
+                self.START = not self.START
 
             if self.START:
-                self.keyboard.send_controller(action[0], action[1])
+                if sum(obs) < 1:
+                    # safety
+                    pass
+                else:
+                    self.keyboard.send_controller(action[0], action[1])
 
             
 

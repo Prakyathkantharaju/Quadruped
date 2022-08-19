@@ -55,19 +55,19 @@ class keyboard_control:
     def _reset_msg(self):
         self._create_msg()
         self.pub.send(self.msg)
-        time.sleep(int(1 / self.MESSAGE_RATE))
+        #time.sleep(int(1 / self.MESSAGE_RATE))
 
     def send_start(self):
         self._create_msg()
         self.msg["L1"] = 1
         self.pub.send(self.msg)
-        time.sleep(int(1 / self.MESSAGE_RATE))
+        #time.sleep(int(1 / self.MESSAGE_RATE))
 
     def start_trot(self):
         self._create_msg()
         self.msg["R1"] = 1
         self.pub.send(self.msg)
-        time.sleep(int(1 / self.MESSAGE_RATE))
+        #time.sleep(int(1 / self.MESSAGE_RATE))
 
     def send_no_command(self):
         self._reset_msg()
@@ -79,7 +79,7 @@ class keyboard_control:
         self.msg['ly'] = np.clip(xdot, -0.5, +0.5)
         self.msg['lx'] = np.clip(ydot, -0.5, +0.5)
         self.pub.send(self.msg)
-        time.sleep(int(1 / self.MESSAGE_RATE))
+        #time.sleep(int(1 / self.MESSAGE_RATE))
 
 
 if __name__ == "__main__":
