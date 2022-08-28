@@ -41,7 +41,7 @@ class Control_robot:
             obs = self.sensor.get_obs()
 
             action = self.controller.forward(obs)
-            print(obs, action)
+            print(obs, action[0] * 2, action[1])
             k = cv2.waitKey(1)
 
             if k % 256 == 27:

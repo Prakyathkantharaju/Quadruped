@@ -17,7 +17,7 @@ class perception:
     main perception code reading camera and converting it into the image array
     """
     def __init__(self, position: Tuple[int, int, int, int] = (100, 190, 440, 100), n_obs: int = 20, \
-            live_window: bool = True, video_capture_device: int = 4, color: str = "red"):
+            live_window: bool = True, video_capture_device: int = 0, color: str = "red"):
 
         """ Main perception code to read the image and convert it to the images.
             Args:
@@ -76,6 +76,7 @@ class perception:
 
         # converting the images into black and white
         frame_bnw = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+        frame_bnw = cv2.blur(frame_bnw, (15,15))
 
         # get color threshold value
         color = webcolors.name_to_rgb(self.COLOR)
