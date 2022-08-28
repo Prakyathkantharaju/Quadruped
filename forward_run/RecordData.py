@@ -44,6 +44,6 @@ class RecordData:
         self._store_data()
 
     def _store_data(self):
-        np.savetxt(self.input_file_path, self.input, delimiter=',')
-        np.savetxt(self.output_file_path, self.output, delimiter=',')
+        np.savetxt(self.input_file_path, self.input.T, delimiter=',')
+        np.savetxt(self.output_file_path, self.output.T, delimiter=',')
         cv2.imwrite(self.image_folder + '/' + str(self.img_n) + '.jpeg', self.cur_img)
