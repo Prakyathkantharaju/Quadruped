@@ -60,6 +60,7 @@ class perception:
 
     def get_obs(self) -> np.ndarray:
         ret, frame = self.vid.read()
+        self.frame = frame
 
         if not ret:
             logging.error("Camera not found restart the controller.")

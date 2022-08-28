@@ -7,6 +7,11 @@ from forward_run.forward_run import controller
 # keyboard control
 from forward_run.mapping.keyboard_control import keyboard_control
 
+# Record data
+from forward_run.RecordData import RecordData
+
+
+
 # main sensor
 from perception.main_perception import perception
 
@@ -23,6 +28,9 @@ class Control_robot:
 
         # keyboard
         self.keyboard = keyboard_control()
+
+        # record RecordData
+        self.record = RecordData()
 
 
         # start_ controller
@@ -61,6 +69,7 @@ class Control_robot:
                 else:
                     self.keyboard.send_controller(action[0], action[1])
 
+            self.record.recordData(obs, action, self.sensor.frame)
             
 
 if __name__ == "__main__":
