@@ -17,7 +17,7 @@ class perception:
     main perception code reading camera and converting it into the image array
     """
     def __init__(self, position: Tuple[int, int, int, int] = (100, 190, 440, 100), n_obs: int = 20, \
-            live_window: bool = True, video_capture_device: int = 0, color: str = "red"):
+            live_window: bool = True, video_capture_device: int = 4, color: str = "red"):
 
         """ Main perception code to read the image and convert it to the images.
             Args:
@@ -81,9 +81,9 @@ class perception:
         # get color threshold value
         color = webcolors.name_to_rgb(self.COLOR)
         color = np.array(list(color))
-        # seg = cv2.inRange(frame_bnw, (0, 0, 0), (80, 80, 80))# This is for black
+        seg = cv2.inRange(frame_bnw, (100, 100, 100), (180, 180, 180))# This is for black
         # seg = cv2.inRange(frame_bnw, (100, 0, 0), (255, 80, 80)) # this for red
-        seg = cv2.inRange(frame_bnw, (0, 150, 100), (120, 255, 255)) # this for blue
+        # seg = cv2.inRange(frame_bnw, (0, 150, 100), (120, 255, 255)) # this for blue
         cv2.imshow("seg", seg)
         seg = seg[self.CAMERA_POSITION[1]:self.CAMERA_POSITION[1] +self.CAMERA_POSITION[3],
                 self.CAMERA_POSITION[0]:self.CAMERA_POSITION[0] + self.CAMERA_POSITION[2]]
