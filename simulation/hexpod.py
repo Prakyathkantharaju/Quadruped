@@ -205,7 +205,8 @@ class AntEnv(MujocoEnv, utils.EzPickle):
 
         # counter
         self.i = 0
-        obs_shape = 27
+        self.store_tracking = []
+        obs_shape = 27 + 2
         
         if not exclude_current_positions_from_observation:
             obs_shape += 2
@@ -250,6 +251,12 @@ class AntEnv(MujocoEnv, utils.EzPickle):
         state = self.state_vector()
         min_z, max_z = self._healthy_z_range
         is_healthy = np.isfinite(state).all() and min_z <= state[2] <= max_z
+        # checking if the ant is going in the right direction
+        if self.i % 50 == 0 and np.mean(self.store_tracking[-5]) > 0.5:
+            print("Tracking is not working")
+            is_tracking = False
+        else:
+            is_tracking = True
         return is_healthy
 
     @property
@@ -277,15 +284,14 @@ class AntEnv(MujocoEnv, utils.EzPickle):
 
         xy_velocity = (xy_position_after - xy_position_before) / self.dt
         x_velocity, y_velocity = xy_velocity
-        forward_reward = np.sqrt(self.com_velocity )
-        
-        # checking if the ant is going in the right direction
+        tracking_mse = np.sqrt(np.sum((self.com_velocity - xy_velocity)**2))
+        self.store_tracking.append(tracking_mse)
+        tracking_reward = 1 / tracking_mse
 
-
-        forward_reward = x_velocity
+        #forward_reward = x_velocity
         healthy_reward = self.healthy_reward
 
-        rewards = forward_reward + healthy_reward
+        rewards = tracking_reward + healthy_reward
 
         costs = ctrl_cost = self.control_cost(action)
 
@@ -302,7 +308,7 @@ class AntEnv(MujocoEnv, utils.EzPickle):
             "distance_from_origin": np.linalg.norm(xy_position_after, ord=2),
             "x_velocity": x_velocity,
             "y_velocity": y_velocity,
-            "forward_reward": forward_reward,
+            "tracking_reward": tracking_reward,
         }
         if self._use_contact_forces:
             contact_cost = self.contact_cost
@@ -323,9 +329,9 @@ class AntEnv(MujocoEnv, utils.EzPickle):
 
         if self._use_contact_forces:
             contact_force = self.contact_forces.flat.copy()
-            return np.concatenate((position, velocity, contact_force))
+            return np.concatenate((self.com_velocity, position, velocity, contact_force))
         else:
-            return np.concatenate((position, velocity))
+            return np.concatenate((self.com_velocity, position, velocity))
 
     def reset_model(self):
         noise_low = -self._reset_noise_scale
@@ -345,8 +351,8 @@ class AntEnv(MujocoEnv, utils.EzPickle):
         # counter
         self.i = 0
 
-        # storing previous direction
-        self.prev_velocity = []
+        # storing tracking error
+        self.store_tracking = []
 
         return observation
 
