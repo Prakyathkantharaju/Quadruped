@@ -1,6 +1,7 @@
 
 
 import numpy as np
+from sklearn.metrics import mean_squared_error
 
 from gym import utils
 from gym.envs.mujoco import MujocoEnv
@@ -204,7 +205,7 @@ class AntEnv(MujocoEnv, utils.EzPickle):
         )
 
         # counter
-        self.i = 0
+        self.i = 1
         self.store_tracking = []
         obs_shape = 27 + 2
         
@@ -252,12 +253,11 @@ class AntEnv(MujocoEnv, utils.EzPickle):
         min_z, max_z = self._healthy_z_range
         is_healthy = np.isfinite(state).all() and min_z <= state[2] <= max_z
         # checking if the ant is going in the right direction
-        if self.i % 50 == 0 and np.mean(self.store_tracking[-5]) > 0.5:
-            print("Tracking is not working")
+        if self.i % 10 == 0 and np.mean(self.store_tracking[:-5]) > 0.5:
             is_tracking = False
         else:
             is_tracking = True
-        return is_healthy
+        return is_healthy and is_tracking
 
     @property
     def terminated(self):
@@ -266,13 +266,13 @@ class AntEnv(MujocoEnv, utils.EzPickle):
 
     @property
     def com_velocity(self):
-        if self.i < 100:
+        if self.i < 300:
             return np.array([1, 0])
-        elif 100 <= self.i < 200:
+        elif 100 <= self.i < 600:
             return np.array([1, 1])
-        elif 200 <= self.i < 300:
+        elif 200 <= self.i < 900:
             return np.array([-1, -1])
-        elif 300 <= self.i < 400:
+        elif 300 <= self.i < 1200:
             return np.array([-1, 0])
         else:
             return np.array([1, 0])
@@ -284,9 +284,13 @@ class AntEnv(MujocoEnv, utils.EzPickle):
 
         xy_velocity = (xy_position_after - xy_position_before) / self.dt
         x_velocity, y_velocity = xy_velocity
-        tracking_mse = np.sqrt(np.sum((self.com_velocity - xy_velocity)**2))
+        tracking_mse = mean_squared_error(xy_velocity, self.com_velocity)
+
         self.store_tracking.append(tracking_mse)
         tracking_reward = 1 / tracking_mse
+        tracking_reward = tracking_reward * 0.2
+
+        # print(f"tracking_mse {tracking_mse}, tracking_reward {tracking_reward}, original velocity {xy_velocity}")
 
         #forward_reward = x_velocity
         healthy_reward = self.healthy_reward
@@ -300,7 +304,7 @@ class AntEnv(MujocoEnv, utils.EzPickle):
         self.i += 1
         observation = self._get_obs()
         info = {
-            "reward_forward": forward_reward,
+            "reward_forward": tracking_reward,
             "reward_ctrl": -ctrl_cost,
             "reward_survive": healthy_reward,
             "x_position": xy_position_after[0],
@@ -334,6 +338,8 @@ class AntEnv(MujocoEnv, utils.EzPickle):
             return np.concatenate((self.com_velocity, position, velocity))
 
     def reset_model(self):
+        
+        #print(f"Resting model {self.i}")
         noise_low = -self._reset_noise_scale
         noise_high = self._reset_noise_scale
 
@@ -349,7 +355,7 @@ class AntEnv(MujocoEnv, utils.EzPickle):
         observation = self._get_obs()
 
         # counter
-        self.i = 0
+        self.i = 1
 
         # storing tracking error
         self.store_tracking = []

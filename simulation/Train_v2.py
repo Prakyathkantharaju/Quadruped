@@ -97,32 +97,32 @@ def make_env(seed=0):
     return _init
 
 def make_env_2(seed=0):
-	"""
-	Create a wrapped, monitored SubprocVecEnv for Hopper
-	"""
-	def _init():
-		# env.reset()
+    """
+    Create a wrapped, monitored SubprocVecEnv for Hopper
+    """
+    def _init():
+        # env.reset()
 
-		env = gym.make('car-robot-v2')
-		print(f"env seed: {seed}")
-		return Monitor(env, info_keywords=('reward', 'distance','episode_length', 'id'), filename=f'.run_logs/logs/{run.id}_2')
+        env = gym.make('car-robot-v2')
+        print(f"env seed: {seed}")
+        return Monitor(env, info_keywords=('reward', 'distance','episode_length', 'id'), filename=f'.run_logs/logs/{run.id}_2')
 
-	set_random_seed(seed)
-	return _init
+    set_random_seed(seed)
+    return _init
 
 def make_env_3(seed=0):
-	"""
-	Create a wrapped, monitored SubprocVecEnv for Hopper
-	"""
-	def _init():
-		# env.reset()
+    """
+    Create a wrapped, monitored SubprocVecEnv for Hopper
+    """
+    def _init():
+        # env.reset()
 
-		env = gym.make('car-robot-v3')
-		print(f"env seed: {seed}")
-		return Monitor(env, info_keywords=('reward', 'distance','episode_length', 'id'), filename=f'.run_logs/logs/{run.id}_3')
+        env = gym.make('car-robot-v3')
+        print(f"env seed: {seed}")
+        return Monitor(env, info_keywords=('reward', 'distance','episode_length', 'id'), filename=f'.run_logs/logs/{run.id}_3')
 
-	set_random_seed(seed)
-	return _init
+    set_random_seed(seed)
+    return _init
 
 
 if __name__ == '__main__':
