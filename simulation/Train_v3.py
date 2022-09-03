@@ -42,7 +42,7 @@ run = wandb.init(
     sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
     monitor_gym=True,  # auto-upload the videos of agents playing the game
     save_code=True,  # optional
-    name="PPO-Ant-v5-1",
+    name="PPO-Ant-v5-desktop",
 )
 
 
@@ -78,5 +78,5 @@ if __name__ == '__main__':
     create_eval_env=True)
     # model.load("Models_parkour_large_1")
 
-    model.learn(total_timesteps=1e10, log_interval=1, callback=WandbCallback(gradient_save_freq=500000,  model_save_freq=100000,
+    model.learn(total_timesteps=1e10, log_interval=100, callback=WandbCallback(gradient_save_freq=500000,  model_save_freq=100000,
                                     model_save_path=f"./.run_logs/models/{run.id}", verbose=2))

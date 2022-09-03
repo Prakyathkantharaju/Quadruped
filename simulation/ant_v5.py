@@ -255,7 +255,7 @@ class AntEnv(MujocoEnv, utils.EzPickle):
         is_healthy = np.isfinite(state).all() and min_z <= state[2] <= max_z
         # checking if the ant is going in the right direction
         if self.i > 3 and np.mean(self.store_tracking[-1]) > 0.1:
-            print(np.mean(self.store_tracking[-1]), self.i, self.xy_vel, self.com_velocity)
+            #print(np.mean(self.store_tracking[-1]), self.i, self.xy_vel, self.com_velocity)
             is_tracking = False
         else:
             is_tracking = True
@@ -282,8 +282,8 @@ class AntEnv(MujocoEnv, utils.EzPickle):
             return np.array([0.5,0])
         elif 50 <= self.i < 100:
             return self._com_vel[1, :]
-        elif 150 <= self.i < 200:
-            return self._com_vel[2, :]
+        elif 100 <= self.i < 200:
+            return np.array([0.1, 0.0])
         elif 200 <= self.i < 250:
             return self._com_vel[3, :]
         elif 250 <= self.i < 300:
