@@ -42,7 +42,7 @@ run = wandb.init(
     sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
     monitor_gym=True,  # auto-upload the videos of agents playing the game
     save_code=True,  # optional
-    name="PPO-Ant-v5",
+    name="PPO-Ant-v5-1",
 )
 
 
@@ -56,15 +56,16 @@ def make_env(seed=0):
 
         env = gym.make('Ant_v5')
         print(f"env seed: {seed}")
-        return Monitor(env , info_keywords=('reward_forward','x_position','y_position', 'reward_ctrl'),
-                filename=f'.run_logs/logs/{run.id}1')
+        return Monitor(env, info_keywords=('reward_forward', 'x_position', 'y_position', 'reward_ctrl', 'cur_velocity', 'x_velocity', 'y_velocity'),
+                        filename=f'.run_logs/logs/{run.id}_2')
 
     set_random_seed(seed)
     return _init
 
 
 if __name__ == '__main__':
-    env_list = [make_env(0)]
+    env_list = [make_env(0), make_env(1), make_env(2), make_env(3), make_env(4)]
+    # env_list = [make_env(0)]
 
     # check_env(env)
     # train_env = DummyVecEnv(env_list)
@@ -77,5 +78,5 @@ if __name__ == '__main__':
     create_eval_env=True)
     # model.load("Models_parkour_large_1")
 
-    model.learn(total_timesteps=1000000, log_interval=1, callback=WandbCallback(gradient_save_freq=10000,  model_save_freq=100000,
+    model.learn(total_timesteps=1e10, log_interval=1, callback=WandbCallback(gradient_save_freq=500000,  model_save_freq=100000,
                                     model_save_path=f"./.run_logs/models/{run.id}", verbose=2))

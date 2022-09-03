@@ -169,7 +169,7 @@ class AntEnv(MujocoEnv, utils.EzPickle):
         healthy_z_range=(0.2, 1.0),
         contact_force_range=(-1.0, 1.0),
         reset_noise_scale=0.1,
-        exclude_current_positions_from_observation=True,
+        exclude_current_positions_from_observation=False,
         **kwargs
     ):
         utils.EzPickle.__init__(
@@ -217,6 +217,7 @@ class AntEnv(MujocoEnv, utils.EzPickle):
         observation_space = Box(
             low=-np.inf, high=np.inf, shape=(obs_shape,), dtype=np.float64
         )
+        self._load_velocities()
 
         MujocoEnv.__init__(
             self, xml_file, 5, observation_space=observation_space, **kwargs
@@ -253,7 +254,8 @@ class AntEnv(MujocoEnv, utils.EzPickle):
         min_z, max_z = self._healthy_z_range
         is_healthy = np.isfinite(state).all() and min_z <= state[2] <= max_z
         # checking if the ant is going in the right direction
-        if self.i % 10 == 0 and np.mean(self.store_tracking[:-5]) > 0.5:
+        if self.i > 3 and np.mean(self.store_tracking[-1]) > 0.1:
+            print(np.mean(self.store_tracking[-1]), self.i, self.xy_vel, self.com_velocity)
             is_tracking = False
         else:
             is_tracking = True
@@ -264,18 +266,40 @@ class AntEnv(MujocoEnv, utils.EzPickle):
         terminated = not self.is_healthy if self._terminate_when_unhealthy else False
         return terminated
 
+    def _load_velocities(self):
+        self._com_vel = np.array([[0.5, 0],
+                            [0.3, 0.3],
+                            [0.1, 0.2],
+                            [0.2, 0.5],
+                            [0.5, 0.5],
+                            [0.1, 0],
+                            [0.5, 0.1]])
+        np.random.shuffle(self._com_vel)
+
     @property
     def com_velocity(self):
-        if self.i < 300:
-            return np.array([1, 0])
-        elif 100 <= self.i < 600:
-            return np.array([1, 1])
-        elif 200 <= self.i < 900:
-            return np.array([-1, -1])
-        elif 300 <= self.i < 1200:
-            return np.array([-1, 0])
+        if self.i < 50:
+            return np.array([0.5,0])
+        elif 50 <= self.i < 100:
+            return self._com_vel[1, :]
+        elif 150 <= self.i < 200:
+            return self._com_vel[2, :]
+        elif 200 <= self.i < 250:
+            return self._com_vel[3, :]
+        elif 250 <= self.i < 300:
+            return self._com_vel[4, :]
+        elif 300 <= self.i < 350:
+            return self._com_vel[5, :]
+        elif 350 <= self.i < 400:
+            return self._com_vel[0, :]
+        elif 400 <= self.i < 450:
+            return self._com_vel[2, :]
+        elif 450 <= self.i < 550:
+            return self._com_vel[4, :]
+        elif 500 <= self.i < 650:
+            return self._com_vel[3, :]
         else:
-            return np.array([1, 0])
+            return self._com_vel[4, :] + np.random.random()
 
     def step(self, action):
         xy_position_before = self.get_body_com("torso")[:2].copy()
@@ -283,19 +307,20 @@ class AntEnv(MujocoEnv, utils.EzPickle):
         xy_position_after = self.get_body_com("torso")[:2].copy()
 
         xy_velocity = (xy_position_after - xy_position_before) / self.dt
+        self.xy_vel = xy_velocity
         x_velocity, y_velocity = xy_velocity
         tracking_mse = mean_squared_error(xy_velocity, self.com_velocity)
 
         self.store_tracking.append(tracking_mse)
-        tracking_reward = 1 / tracking_mse
-        tracking_reward = tracking_reward * 0.2
+        tracking_reward = 0.2 / (tracking_mse)
+        np.clip(tracking_reward,0, 10)
 
-        # print(f"tracking_mse {tracking_mse}, tracking_reward {tracking_reward}, original velocity {xy_velocity}")
+        # print(f"tracking_mse {tracking_mse}, tracking_reward {tracking_reward} original velocity {xy_velocity}")
 
-        #forward_reward = x_velocity
+        # forward_reward = x_velocity
         healthy_reward = self.healthy_reward
 
-        rewards = tracking_reward + healthy_reward
+        rewards = healthy_reward
 
         costs = ctrl_cost = self.control_cost(action)
 
@@ -313,6 +338,10 @@ class AntEnv(MujocoEnv, utils.EzPickle):
             "x_velocity": x_velocity,
             "y_velocity": y_velocity,
             "tracking_reward": tracking_reward,
+            "cur_velocity": observation[:2]
+            # "reward": rewards,
+            # "episode": self.i,
+            # "cur_velocity": observation[:2]
         }
         if self._use_contact_forces:
             contact_cost = self.contact_cost
