@@ -254,7 +254,7 @@ class AntEnv(MujocoEnv, utils.EzPickle):
         min_z, max_z = self._healthy_z_range
         is_healthy = np.isfinite(state).all() and min_z <= state[2] <= max_z
         # checking if the ant is going in the right direction
-        if self.i > 3 and np.mean(self.store_tracking[-1]) > 0.1:
+        if self.i > 20 and np.mean(self.store_tracking[-1]) > 0.1:
             #print(np.mean(self.store_tracking[-1]), self.i, self.xy_vel, self.com_velocity)
             is_tracking = False
         else:
@@ -267,7 +267,7 @@ class AntEnv(MujocoEnv, utils.EzPickle):
         return terminated
 
     def _load_velocities(self):
-        self._com_vel = np.array([[0.5, 0],
+        self._com_vel = np.array([[0.2, 0],
                             [0.3, 0.3],
                             [0.1, 0.2],
                             [0.2, 0.5],
@@ -278,9 +278,9 @@ class AntEnv(MujocoEnv, utils.EzPickle):
 
     @property
     def com_velocity(self):
-        if self.i < 50:
-            return np.array([0.5,0])
-        elif 50 <= self.i < 100:
+        if self.i < 100:
+            return np.array([0.3,0])
+        elif 100 <= self.i < 150:
             return self._com_vel[1, :]
         elif 100 <= self.i < 200:
             return np.array([0.1, 0.0])
@@ -313,14 +313,14 @@ class AntEnv(MujocoEnv, utils.EzPickle):
 
         self.store_tracking.append(tracking_mse)
         tracking_reward = 0.2 / (tracking_mse)
-        np.clip(tracking_reward,0, 10)
+        np.clip(tracking_reward,0, 100)
 
         # print(f"tracking_mse {tracking_mse}, tracking_reward {tracking_reward} original velocity {xy_velocity}")
 
         # forward_reward = x_velocity
         healthy_reward = self.healthy_reward
 
-        rewards = healthy_reward
+        rewards = healthy_reward + tracking_reward
 
         costs = ctrl_cost = self.control_cost(action)
 
