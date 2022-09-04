@@ -24,8 +24,8 @@ import wandb
 from wandb.integration.sb3 import WandbCallback
 
 gym.envs.register(
-     id='Ant_v6',
-     entry_point='ant_v6:AntEnv',
+     id='Ant_v7',
+     entry_point='ant_v7:AntEnv',
      max_episode_steps=5000,
 )
 
@@ -42,7 +42,7 @@ run = wandb.init(
     sync_tensorboard=True,  # auto-upload sb3's tensorboard metrics
     monitor_gym=True,  # auto-upload the videos of agents playing the game
     save_code=True,  # optional
-    name="A2C-Ant-v6-desktop",
+    name="A2C-Ant-v7-desktop",
 )
 
 
@@ -54,7 +54,7 @@ def make_env(seed=0):
     def _init():
         # env.reset()
 
-        env = gym.make('Ant_v6')
+        env = gym.make('Ant_v7')
         print(f"env seed: {seed}")
         return Monitor(env, info_keywords=('reward_forward', 'x_position', 'y_position', 'reward_ctrl', 'cur_velocity', 'x_velocity', 'y_velocity'),
                         filename=f'.run_logs/logs/{run.id}_2')
@@ -75,8 +75,8 @@ if __name__ == '__main__':
     train_env.reset()
 
     model = A2C("MlpPolicy", train_env, tensorboard_log=f"./.run_logs/logs/{run.id}", device="cuda", normalize_advantage=True,
-    create_eval_env=True)
+    create_eval_env=True, verbose=1)
     # model.load("Models_parkour_large_1")
 
-    model.learn(total_timesteps=1e8, log_interval=1, callback=WandbCallback(gradient_save_freq=500000,  model_save_freq=100000,
+    model.learn(total_timesteps=2.5e6, log_interval=100, callback=WandbCallback(gradient_save_freq=500000,  model_save_freq=100000,
                                     model_save_path=f"./.run_logs/models/{run.id}", verbose=2))
