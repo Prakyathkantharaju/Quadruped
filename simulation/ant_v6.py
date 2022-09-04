@@ -281,6 +281,7 @@ class AntEnv(MujocoEnv, utils.EzPickle):
     def com_velocity(self):
         if self.i < 100:
             return np.array([0.3,0]) - self.xy_vel
+
         elif 100 <= self.i < 150:
             return self._com_vel[1, :] - self.xy_vel
         elif 100 <= self.i < 200:
@@ -310,7 +311,7 @@ class AntEnv(MujocoEnv, utils.EzPickle):
         xy_velocity = (xy_position_after - xy_position_before) / self.dt
         self.xy_vel = xy_velocity
         x_velocity, y_velocity = xy_velocity
-        tracking_mse = mean_squared_error(xy_velocity, self.com_velocity)
+        tracking_mse = mean_squared_error(xy_velocity, self.com_velocity + self.xy_vel)
 
         self.store_tracking.append(tracking_mse)
         tracking_reward = 0.2 / (tracking_mse)

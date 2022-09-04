@@ -17,8 +17,9 @@ env.reset()
 
 for i in range(50):
     act = env.action_space.sample()
-    obs, _, _, _ = env.step(act)
+    obs, _, _, info = env.step(act)
     print(obs)
+    print(f"x vel {info['x_velocity']}, y {info['y_velocity']}")
     
     
 
