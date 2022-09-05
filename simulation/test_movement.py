@@ -33,6 +33,5 @@ for i in range(1000):
     if terminate:
         print(env.i)
         obs = env.reset()
-    print(vel)
     
 
