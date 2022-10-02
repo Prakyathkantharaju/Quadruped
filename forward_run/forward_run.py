@@ -17,17 +17,19 @@ class controller:
 
     # def __init__(self, PPO_path: str = "/home/prakyathkantharaju/github/personal/Quadruped/forward_run/full_model_new_cost.pkl",
     # model_path: str = "/home/prakyathkantharaju/github/personal/Quadruped/simulation/models/block.xml") -> None:
-    def __init__(self, PPO_path: str = "/home/prakyathkantharaju/gitfolder/personal/Quadruped/forward_run/full_model_new_cost.pkl",
-    model_path: str = "/home/prakyathkantharaju/gitfolder/personal/Quadruped/simulation/models/block.xml") -> None:
+    # def __init__(self, PPO_path: str = "/home/prakyathkantharaju/gitfolder/personal/Quadruped/forward_run/full_model_new_cost.pkl",
+    # model_path: str = "/home/prakyathkantharaju/gitfolder/personal/Quadruped/simulation/models/block.xml") -> None:
+    def __init__(self, PPO_path: str = "/home/prakyath/github/personal/Quadruped/forward_run/full_model_new_cost.pkl",
+    model_path: str = "/home/prakyath/github/personal/Quadruped/simulation/models/block.xml") -> None:
         
-        gym.envs.register(
-             id='car-robot-v1',
-             entry_point='forward_run.car_env_5:CarEnv',
-             max_episode_steps=5000,
-             kwargs={'model_path': model_path, 'id': 1}
-        )
+        # gym.envs.register(
+        #      id='car-robot-v1',
+        #      entry_point='forward_run.car_env_5:CarEnv',
+        #      max_episode_steps=5000,
+        #      kwargs={'model_path': model_path, 'id': 1}
+        # )
 
-        self.env = gym.make("car-robot-v1")
+        # self.env = gym.make("car-robot-v1")
 
         self.ppo = PPO.load(PPO_path)
 

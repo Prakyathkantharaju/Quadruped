@@ -41,7 +41,8 @@ class RecordData:
             self.img_n += 1
             self.cur_img = img
 
-        self._store_data()
+        if self.img_n > 200:
+            self._store_data()
 
     def _store_data(self):
         np.savetxt(self.input_file_path, self.input.T, delimiter=',')
